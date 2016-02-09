@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">BartNearMe</string>
+    <string name="find_me">Me</string>
+    <string name="find_bart">Bart</string>
+    <string name="loading">loading…</string>
+    <string name="service_unavailable">Can\u0027t connect to google services</string>
+    <string name="service_ready">Ready to Map</string>
+    <string name="service_not_ready">Map not available</string>
+    <string name="google_map_key">AIzaSyAqEbC-xmYxjB-QJuBNB9nFC9-HNkI-6y0</string>
+    <string name="input_title">Location:</string>
+    <string name="input_hint">Manually input location</string>
+    <string name="last_location_failed">Can\u0027t find your location</string>
+    <string name="alter_wrong_input">No result matched your input address</string>
+    <string name="alter_button_comfirm">Yup</string>
+</resources>
