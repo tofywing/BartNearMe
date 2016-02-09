@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearyou;
+package googleapi1.yee.interview.bartnearme;
 
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
@@ -7,14 +7,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
-import android.view.View;
 
-import googleapi1.yee.interview.bartnearyou.CallBack.MapCallBack;
-import googleapi1.yee.interview.bartnearyou.CallBack.ServiceCallBack;
-import googleapi1.yee.interview.bartnearyou.Fragment.GoogleMapFragment;
-import googleapi1.yee.interview.bartnearyou.Fragment.StationDetailsFragment;
-import googleapi1.yee.interview.bartnearyou.Fragment.StationListFragment;
-import googleapi1.yee.interview.bartnearyou.Service.BartService;
+import googleapi1.yee.interview.bartnearme.CallBack.MapCallBack;
+import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
+import googleapi1.yee.interview.bartnearme.Fragment.GoogleMapFragment;
+import googleapi1.yee.interview.bartnearme.Fragment.StationDetailsFragment;
+import googleapi1.yee.interview.bartnearme.Fragment.StationListFragment;
+import googleapi1.yee.interview.bartnearme.Service.BartService;
 
 /**
  * Created by Yee on 2/2/16.

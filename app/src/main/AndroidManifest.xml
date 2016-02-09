@@ -1,5 +1,5 @@
 <manifest
-    package="googleapi1.yee.interview.bartnearyou"
+    package="googleapi1.yee.interview.bartnearme"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -17,7 +17,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name="googleapi1.yee.interview.bartnearme.MainActivity"
             android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

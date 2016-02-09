@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearyou;
+package googleapi1.yee.interview.bartnearme;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,7 +7,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
-import googleapi1.yee.interview.bartnearyou.Fragment.GoogleMapFragment;
+import googleapi1.yee.interview.bartnearme.Fragment.GoogleMapFragment;
 
 /**
  * Created by Yee on 2/8/16.
