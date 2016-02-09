@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearyou.Fragment;
+package googleapi1.yee.interview.bartnearme.Fragment;
 
 import android.os.Bundle;
 import android.app.Fragment;
@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import googleapi1.yee.interview.bartnearyou.R;
+import googleapi1.yee.interview.bartnearme.R;
 
 /**
  * Created by Yee on 2/4/16.

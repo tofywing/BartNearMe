@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearyou.Fragment;
+package googleapi1.yee.interview.bartnearme.Fragment;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -7,7 +7,6 @@ import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -48,11 +47,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
-import googleapi1.yee.interview.bartnearyou.CallBack.ServiceCallBack;
-import googleapi1.yee.interview.bartnearyou.MapStateManager;
-import googleapi1.yee.interview.bartnearyou.R;
-import googleapi1.yee.interview.bartnearyou.Service.BartService;
-import googleapi1.yee.interview.bartnearyou.Station;
+import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
+import googleapi1.yee.interview.bartnearme.MapStateManager;
+import googleapi1.yee.interview.bartnearme.R;
+import googleapi1.yee.interview.bartnearme.Service.BartService;
+import googleapi1.yee.interview.bartnearme.Station;
 
 /**
  * Created by Yee on 2/5/16.
