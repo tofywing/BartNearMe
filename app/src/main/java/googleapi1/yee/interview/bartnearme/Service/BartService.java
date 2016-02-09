@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearyou.Service;
+package googleapi1.yee.interview.bartnearme.Service;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,10 +15,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import googleapi1.yee.interview.bartnearyou.CallBack.ServiceCallBack;
-import googleapi1.yee.interview.bartnearyou.MainActivity;
-import googleapi1.yee.interview.bartnearyou.R;
-import googleapi1.yee.interview.bartnearyou.Station;
+import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
+import googleapi1.yee.interview.bartnearme.R;
+import googleapi1.yee.interview.bartnearme.Station;
 
 /**
  * Created by Yee on 2/4/16.
