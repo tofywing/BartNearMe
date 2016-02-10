@@ -19,13 +19,7 @@ public class StationListFragment extends ListFragment {
 
     public static final String TAG = "stationDetailedFragment";
     StationDetailsFragment mDetailFragment;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        StationAdapter adapter = new StationAdapter(getActivity(), R.layout.station_adapter, Station.getData());
-        setListAdapter(adapter);
-    }
+    FragmentManager mManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -33,12 +27,27 @@ public class StationListFragment extends ListFragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        StationAdapter adapter = new StationAdapter(getActivity(), R.layout.station_adapter, Station.getData());
+        mManager = getActivity().getFragmentManager();
+        setListAdapter(adapter);
+    }
+
+    @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        FragmentManager manager = getActivity().getFragmentManager();
-        if (mDetailFragment != null && mDetailFragment.isAdded()) manager.beginTransaction().remove(mDetailFragment)
+
+        if (mDetailFragment != null && mDetailFragment.isAdded()) mManager.beginTransaction().remove(mDetailFragment)
                 .commit();
         mDetailFragment = StationDetailsFragment.newInstance(Station.getData().get(position));
-        manager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();
+        mManager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mDetailFragment != null && mDetailFragment.isAdded()) mManager.beginTransaction().remove(mDetailFragment)
+                .commit();
+        super.onDestroy();
     }
 }

@@ -350,21 +350,14 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     @Override
     public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
-
-        //Station.setData(list);
-
         StationManager stationManager = new StationManager(list);
         Station.setData(stationManager.getCloseStation(mLatLng, 5));
+        if (mListFragment != null && mListFragment.isAdded())
+            mManager.beginTransaction().remove(mListFragment).commit();
+        mListFragment = new StationListFragment();
+        mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
 
-        if (Station.getData().size() != 0) {
-            if (mListFragment != null && mListFragment.isAdded())
-                mManager.beginTransaction().remove(mListFragment).commit();
-            mListFragment = new StationListFragment();
-            mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
-            dialog.dismiss();
-        } else {
-            Snackbar.make(getView(), getText(R.string.no_stations_found), Snackbar.LENGTH_LONG).show();
-        }
+        dialog.dismiss();
     }
 
     @Override
