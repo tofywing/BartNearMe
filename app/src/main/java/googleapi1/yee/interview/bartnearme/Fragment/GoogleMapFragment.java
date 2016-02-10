@@ -19,6 +19,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -313,8 +314,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 .android.gms.location.LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                String temp = "Location:" + location.getLatitude() + location.getLongitude();
-                Toast.makeText(getActivity(), temp, Toast.LENGTH_SHORT).show();
+                Log.i("LatLng", "Location:" + location.getLatitude() + location.getLongitude());
             }
         });
         try {
