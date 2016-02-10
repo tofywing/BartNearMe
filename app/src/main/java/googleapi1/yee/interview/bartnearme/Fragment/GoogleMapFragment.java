@@ -45,6 +45,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
@@ -61,6 +62,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         .OnConnectionFailedListener, ServiceCallBack {
 
     public static final int DEFAULT_ZOOM = 15;
+    public static final int STATION_ZOOM = 9;
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String LAST_UPDATE_TIME = "updateTime";
     private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
@@ -88,6 +90,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     ColorStateList pink = new ColorStateList(colorPattern, colorPattern[0]);
     ColorStateList blue = new ColorStateList(colorPattern, colorPattern[1]);
     LatLng mLatLng;
+    List<Marker> mMarkerList = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -235,7 +238,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             double lng = mCurrentLocation.getLongitude();
             List<Address> addresses = gc.getFromLocation(lat, lng, 1);
             mLocality = addresses.get(0).getLocality();
-            setMarker(mLocality, lat, lng);
+            setStartMarker(mLocality, lat, lng);
             LatLng ll = new LatLng(lat, lng);
             mLatLng = ll;
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, DEFAULT_ZOOM);
@@ -257,7 +260,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 double lng = address.getLongitude();
                 goToLocation(lat, lng, DEFAULT_ZOOM);
                 mLocality = address.getLocality();
-                setMarker(mLocality, lat, lng);
+                setStartMarker(mLocality, lat, lng);
             }
         } else {
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
@@ -339,7 +342,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         outState.putString(LAST_UPDATE_TIME, mLastUpdateTime);
     }
 
-    void setMarker(String locality, double lat, double lng) {
+    void setStartMarker(String locality, double lat, double lng) {
         if (mMarker != null) {
             mMarker.remove();
         }
@@ -348,15 +351,36 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mMarker = mMap.addMarker(options);
     }
 
+    void setEndMarker(List<Station> stationList) {
+        if (mMarkerList != null) {
+            for (Marker marker : mMarkerList) {
+                marker.remove();
+            }
+        }
+        mMarkerList = new LinkedList<>();
+        Marker marker;
+        MarkerOptions options;
+        for (Station station : stationList) {
+            options = new MarkerOptions().title(station.getName()).position(new LatLng(Double
+                    .parseDouble(station.getLatitude()), Double.parseDouble(station.getLongitude()))).icon
+                    (BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            marker = mMap.addMarker(options);
+            mMarkerList.add(marker);
+        }
+    }
+
     @Override
     public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
         StationManager stationManager = new StationManager(list);
-        Station.setData(stationManager.getCloseStation(mLatLng, 5));
+        Station.setData(stationManager.getCloseStationInCount(mLatLng, 5));
         if (mListFragment != null && mListFragment.isAdded())
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = new StationListFragment();
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
-
+        //TODO:
+        setEndMarker(Station.data);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(mLatLng, STATION_ZOOM);
+        mMap.animateCamera(update);
         dialog.dismiss();
     }
 
