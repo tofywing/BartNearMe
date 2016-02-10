@@ -2,36 +2,29 @@ package googleapi1.yee.interview.bartnearme.Fragment;
 
 import android.app.FragmentManager;
 import android.app.ListFragment;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import java.util.List;
-
 import googleapi1.yee.interview.bartnearme.Adapter.StationAdapter;
-import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
 import googleapi1.yee.interview.bartnearme.R;
-import googleapi1.yee.interview.bartnearme.Service.BartService;
 import googleapi1.yee.interview.bartnearme.Station;
 
 /**
  * Created by Yee on 2/4/16.
  */
-public class StationListFragment extends ListFragment implements ServiceCallBack {
+public class StationListFragment extends ListFragment {
 
-    List<Station> mList;
-    BartService mService;
-    ListView mListView;
+    public static final String TAG = "stationDetailedFragment";
     StationDetailsFragment mDetailFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mService = new BartService(getActivity(), this);
-        mService.getStationInfo();
+        StationAdapter adapter = new StationAdapter(getActivity(), R.layout.station_adapter, Station.getData());
+        setListAdapter(adapter);
     }
 
     @Override
@@ -40,31 +33,12 @@ public class StationListFragment extends ListFragment implements ServiceCallBack
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-//        mListView = getListView();
-        final FragmentManager manager = getActivity().getFragmentManager();
-//        mListView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (mDetailFragment != null && mDetailFragment.isAdded()) manager.beginTransaction().remove
-//                        (mDetailFragment).commit();
-//                mDetailFragment = new StationDetailsFragment();
-//                if (mDetailFragment.isAdded()) Toast.makeText(getActivity(), "added", Toast.LENGTH_LONG).show();
-//            }
-//        });-
-    }
-
-    @Override
-    public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
-        mList = list;
-        StationAdapter adapter = new StationAdapter(getActivity(), R.layout.station_adapter, mList);
-        setListAdapter(adapter);
-        dialog.dismiss();
-    }
-
-    @Override
-    public void onActionFailed(Exception e, ProgressDialog dialog) {
-        dialog.dismiss();
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        FragmentManager manager = getActivity().getFragmentManager();
+        if (mDetailFragment != null && mDetailFragment.isAdded()) manager.beginTransaction().remove(mDetailFragment)
+                .commit();
+        mDetailFragment = StationDetailsFragment.newInstance(Station.getData().get(position));
+        manager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();
     }
 }

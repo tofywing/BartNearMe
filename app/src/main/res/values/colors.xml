@@ -6,4 +6,5 @@
     <color name="pureWhite">#FFFFFF</color>
     <color name="bartBlue">#366792</color>
     <color name="pureBlack">#000000</color>
+    <color name="lineColor">#C4C4C4</color>
 </resources>

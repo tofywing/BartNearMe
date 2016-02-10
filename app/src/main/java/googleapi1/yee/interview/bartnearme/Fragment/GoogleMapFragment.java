@@ -57,8 +57,12 @@ import googleapi1.yee.interview.bartnearme.Station;
  * Created by Yee on 2/5/16.
  */
 public class GoogleMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient
-        .OnConnectionFailedListener {
+        .OnConnectionFailedListener, ServiceCallBack {
 
+    public static final int DEFAULT_ZOOM = 15;
+    private static final String CURRENT_LOCATION = "currentLocation";
+    private static final String LAST_UPDATE_TIME = "updateTime";
+    private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
     EditText mMapInput;
     FloatingActionButton mMeButton;
     FloatingActionButton mBartButton;
@@ -74,14 +78,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     String mLocality;
     StationListFragment mListFragment;
     BartService mService;
+    FragmentManager mManager;
     //SharedPreferences mSharedPreference;
     //TODO: KEY CHECKING
     boolean mMePressed = true;
     boolean mBartPressed = true;
-    private static final String CURRENT_LOCATION = "currentLocation";
-    private static final String LAST_UPDATE_TIME = "updateTime";
-    private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
-    public static final int DEFAULT_ZOOM = 15;
     int[][] colorPattern = new int[][]{new int[]{Color.parseColor("#FF4081")}, new int[]{Color.parseColor("#366792")}};
     ColorStateList pink = new ColorStateList(colorPattern, colorPattern[0]);
     ColorStateList blue = new ColorStateList(colorPattern, colorPattern[1]);
@@ -110,6 +111,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             if (savedInstanceState.containsKey(LAST_UPDATE_TIME)) mLastUpdateTime = savedInstanceState.getString
                     (LAST_UPDATE_TIME);
         }
+        mService = new BartService(getActivity(), this);
         mMapInput = (EditText) getActivity().findViewById(R.id.mapInput);
         mMapInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -139,30 +141,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mBartButton = (FloatingActionButton) getActivity().findViewById(R.id.findBart);
         mBartButton.setBackgroundTintList(blue);
         mListFragment = new StationListFragment();
-        final FragmentManager manager = getActivity().getFragmentManager();
+        mManager = getActivity().getFragmentManager();
         mBartButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO:
-                //mSharedPreference = getActivity().getSharedPreferences("stationData",Context.MODE_PRIVATE);
-                mService = new BartService(getActivity(), new ServiceCallBack() {
-                    @Override
-                    public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
-                        Station.data = list;
-                        dialog.dismiss();
-                    }
-
-                    @Override
-                    public void onActionFailed(Exception e, ProgressDialog dialog) {
-                        dialog.dismiss();
-                    }
-                });
                 mService.getStationInfo();
-                if (mListFragment != null && mListFragment.isAdded()) manager.beginTransaction().remove
-                        (mListFragment)
-                        .commit();
-                mListFragment = new StationListFragment();
-                manager.beginTransaction().add(R.id.stationList, mListFragment).commit();
             }
         });
     }
@@ -361,4 +344,22 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mMarker = mMap.addMarker(options);
     }
 
+    @Override
+    public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
+        Station.setData(list);
+        if (Station.getData().size() != 0) {
+            if (mListFragment != null && mListFragment.isAdded())
+                mManager.beginTransaction().remove(mListFragment).commit();
+            mListFragment = new StationListFragment();
+            mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
+            dialog.dismiss();
+        } else {
+            Snackbar.make(getView(), getText(R.string.no_stations_found), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    public void onActionFailed(Exception e, ProgressDialog dialog) {
+        dialog.dismiss();
+    }
 }

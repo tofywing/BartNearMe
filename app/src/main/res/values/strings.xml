@@ -12,4 +12,15 @@
     <string name="last_location_failed">Can\u0027t find your location</string>
     <string name="alter_wrong_input">No result matched your input address</string>
     <string name="alter_button_comfirm">Yup</string>
+    <string name="no_stations_found">No stations found</string>
+    <string name="name">Name:</string>
+    <string name="address">Address:</string>
+    <string name="city">City:</string>
+    <string name="state">State:</string>
+    <string name="zip">Zip:</string>
+    <string name="name_unavailable">name unavailable</string>
+    <string name="address_unavailable">address unavailable</string>
+    <string name="city_unavailable">city unavailable</string>
+    <string name="state_unavailable">state unavailable</string>
+    <string name="zip_unavailable">zip unavailable</string>
 </resources>

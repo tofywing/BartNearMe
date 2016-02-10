@@ -2,7 +2,6 @@ package googleapi1.yee.interview.bartnearme;
 
 import android.app.FragmentManager;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,7 +10,6 @@ import android.support.v4.app.FragmentActivity;
 import googleapi1.yee.interview.bartnearme.CallBack.MapCallBack;
 import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
 import googleapi1.yee.interview.bartnearme.Fragment.GoogleMapFragment;
-import googleapi1.yee.interview.bartnearme.Fragment.StationDetailsFragment;
 import googleapi1.yee.interview.bartnearme.Fragment.StationListFragment;
 import googleapi1.yee.interview.bartnearme.Service.BartService;
 
@@ -25,7 +23,7 @@ public class MainActivity extends FragmentActivity {
     //GoogleMapFragment1 mGoogleMapFragment;
     GoogleMapFragment mGoogleMapFragment;
     StationListFragment mListFragment;
-    StationDetailsFragment mDetailsFragment;
+    //StationDetailsFragment mDetailsFragment;
     //FloatingActionButton mMeButton;
     FloatingActionButton mBartButton;
     BartService mService;
@@ -40,16 +38,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.main_layout);
         mSupportManager = getSupportFragmentManager();
         mManager = getFragmentManager();
-        mDetailsFragment = new StationDetailsFragment();
-        mManager.beginTransaction().add(R.id.stationDetail, mDetailsFragment).commit();
         mGoogleMapFragment = new GoogleMapFragment();
         mSupportManager.beginTransaction().add(R.id.map, mGoogleMapFragment).commit();
-    }
-
-    public static void showDialog(Context context, ProgressDialog dialog) {
-        dialog = new ProgressDialog(context);
-        dialog.setMessage(context.getString(R.string.loading));
-        dialog.setCancelable(false);
-        dialog.show();
     }
 }
