@@ -18,9 +18,11 @@
     <string name="city">City:</string>
     <string name="state">State:</string>
     <string name="zip">Zip:</string>
+    <string name="distance">Distance:</string>
     <string name="name_unavailable">name unavailable</string>
     <string name="address_unavailable">address unavailable</string>
     <string name="city_unavailable">city unavailable</string>
     <string name="state_unavailable">state unavailable</string>
     <string name="zip_unavailable">zip unavailable</string>
+    <string name="distance_unavailable">zip unavailable</string>
 </resources>

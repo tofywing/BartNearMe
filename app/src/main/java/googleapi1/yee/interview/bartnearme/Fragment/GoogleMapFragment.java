@@ -52,6 +52,7 @@ import googleapi1.yee.interview.bartnearme.MapStateManager;
 import googleapi1.yee.interview.bartnearme.R;
 import googleapi1.yee.interview.bartnearme.Service.BartService;
 import googleapi1.yee.interview.bartnearme.Station;
+import googleapi1.yee.interview.bartnearme.StationManager;
 
 /**
  * Created by Yee on 2/5/16.
@@ -86,6 +87,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     int[][] colorPattern = new int[][]{new int[]{Color.parseColor("#FF4081")}, new int[]{Color.parseColor("#366792")}};
     ColorStateList pink = new ColorStateList(colorPattern, colorPattern[0]);
     ColorStateList blue = new ColorStateList(colorPattern, colorPattern[1]);
+    LatLng mLatLng;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -204,6 +206,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     private void goToLocation(double lat, double lng, float zoom) {
         LatLng ll = new LatLng(lat, lng);
+        mLatLng = ll;
         mCurrentLocation = new Location("");
         mCurrentLocation.setLatitude(lat);
         mCurrentLocation.setLatitude(lng);
@@ -234,6 +237,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mLocality = addresses.get(0).getLocality();
             setMarker(mLocality, lat, lng);
             LatLng ll = new LatLng(lat, lng);
+            mLatLng = ll;
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, DEFAULT_ZOOM);
             mMap.animateCamera(update);
         } else {
@@ -346,7 +350,12 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     @Override
     public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
-        Station.setData(list);
+
+        //Station.setData(list);
+
+        StationManager stationManager = new StationManager(list);
+        Station.setData(stationManager.getCloseStation(mLatLng, 5));
+
         if (Station.getData().size() != 0) {
             if (mListFragment != null && mListFragment.isAdded())
                 mManager.beginTransaction().remove(mListFragment).commit();

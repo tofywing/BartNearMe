@@ -30,6 +30,7 @@ public class Station implements Parcelable {
     String zipCode;
     String latitude;
     String longitude;
+    String distance;
 
     public Station() {
 
@@ -117,6 +118,14 @@ public class Station implements Parcelable {
 
     public void setName(String station_name) {
         this.name = station_name;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+
+    public void setDistance(String distance) {
+        this.distance = distance;
     }
 
     @Override

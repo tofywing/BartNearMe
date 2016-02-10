@@ -34,7 +34,7 @@ public class StationDetailsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.station_details_fragment, container, false);
+        return inflater.inflate(R.layout.station_details, container, false);
     }
 
     @Override
