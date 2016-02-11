@@ -2,7 +2,6 @@ package googleapi1.yee.interview.bartnearme.Fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +16,6 @@ import googleapi1.yee.interview.bartnearme.Station;
 public class StationDetailsFragment extends Fragment {
 
     public static final String TAG = "stationSelected";
-    FloatingActionButton mButton;
     TextView mName;
     TextView mDistance;
     TextView mAddress;

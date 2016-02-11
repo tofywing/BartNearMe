@@ -23,6 +23,8 @@ public class MapStateManager {
     public static final String BART_PRESSED = "bartPressed";
     public static final String MAP_TYPE = "mapType";
     public static final String ZOOM = "zoom";
+    public static final String LOCALITY = "locality";
+    String locality;
     private SharedPreferences mapStatePrefs;
 
     public MapStateManager(Context context) {
@@ -38,6 +40,7 @@ public class MapStateManager {
         edit.putFloat(BEARING, position.bearing);
         edit.putFloat(ZOOM, position.zoom);
         edit.putInt(MAP_TYPE, map.getMapType());
+        edit.putString(LOCALITY, locality);
         edit.apply();
     }
 
@@ -52,5 +55,15 @@ public class MapStateManager {
         return new CameraPosition(ll, zoom, tilt, bearing);
     }
 
+    public double getLatitude() {
+        return mapStatePrefs.getFloat(LATITUDE, 0);
+    }
 
+    public double getLongitude() {
+        return mapStatePrefs.getFloat(LONGITUDE, 0);
+    }
+
+    public String getLocality() {
+        return mapStatePrefs.getString(LOCALITY, "");
+    }
 }

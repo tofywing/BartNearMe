@@ -37,4 +37,9 @@ public class StationAdapter extends ArrayAdapter<Station> {
         textView.setText(String.valueOf(station.getName()));
         return view;
     }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
 }

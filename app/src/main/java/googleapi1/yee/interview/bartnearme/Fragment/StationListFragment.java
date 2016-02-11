@@ -11,15 +11,16 @@ import android.widget.ListView;
 import googleapi1.yee.interview.bartnearme.Adapter.StationAdapter;
 import googleapi1.yee.interview.bartnearme.R;
 import googleapi1.yee.interview.bartnearme.Station;
+import googleapi1.yee.interview.bartnearme.StationDetailsManager;
 
 /**
  * Created by Yee on 2/4/16.
  */
 public class StationListFragment extends ListFragment {
 
-    public static final String TAG = "stationDetailedFragment";
     StationDetailsFragment mDetailFragment;
     FragmentManager mManager;
+    Station mStation = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -29,25 +30,38 @@ public class StationListFragment extends ListFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        StationAdapter adapter = new StationAdapter(getActivity(), R.layout.station_adapter, Station.getData());
         mManager = getActivity().getFragmentManager();
+        StationDetailsManager manager = new StationDetailsManager(getActivity());
+        mStation = manager.getSavedStation();
+        if (mStation != null) {
+            mDetailFragment = StationDetailsFragment.newInstance(mStation);
+            mManager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();
+        }
+        StationAdapter adapter = new StationAdapter(getActivity(), R.layout.station_adapter, Station.getData());
         setListAdapter(adapter);
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
         if (mDetailFragment != null && mDetailFragment.isAdded()) mManager.beginTransaction().remove(mDetailFragment)
                 .commit();
-        mDetailFragment = StationDetailsFragment.newInstance(Station.getData().get(position));
+        mStation = Station.getData().get(position);
+        mDetailFragment = StationDetailsFragment.newInstance(mStation);
         mManager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();
     }
 
     @Override
-    public void onDestroy() {
-        if (mDetailFragment != null && mDetailFragment.isAdded()) mManager.beginTransaction().remove(mDetailFragment)
-                .commit();
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
+        StationDetailsManager manager = new StationDetailsManager(getActivity());
+        manager.saveStationDetails(mStation);
+    }
+
+    @Override
+    public void onStop() {
+        if (mDetailFragment != null && mDetailFragment.isAdded())
+            mManager.beginTransaction().remove(mDetailFragment).commitAllowingStateLoss();
+        super.onStop();
     }
 }

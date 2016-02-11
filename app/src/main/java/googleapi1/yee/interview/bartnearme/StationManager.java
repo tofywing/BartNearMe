@@ -37,21 +37,6 @@ public class StationManager {
         return Radius * c;
     }
 
-
-//    public double getDistance(LatLng start, LatLng end) {
-//        double startLat = start.latitude;
-//        double startLng = start.longitude;
-//        double endLat = end.latitude;
-//        double endLng = end.longitude;
-//        Location startLocation = new Location("Start");
-//        startLocation.setLatitude(startLat);
-//        startLocation.setLongitude(startLng);
-//        Location endLocation = new Location("End");
-//        endLocation.setLatitude(endLat);
-//        endLocation.setLongitude(endLng);
-//        return startLocation.distanceTo(endLocation);
-//    }
-
     public List<Station> getCloseStationInCount(LatLng start, int count) {
         count = Math.min(count, size);
         List<Station> resultList = new ArrayList<>();
@@ -66,7 +51,6 @@ public class StationManager {
             if (count == 0) break;
             Station station = mStations.get(map.getValue());
             station.setDistance(getDistanceInKM(map.getKey()));
-            //station.setDistance(String.valueOf(map.getKey()));
             resultList.add(station);
             count--;
         }

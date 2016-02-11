@@ -7,13 +7,13 @@ import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -41,6 +41,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -62,8 +63,12 @@ import googleapi1.yee.interview.bartnearme.StationManager;
 public class GoogleMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient
         .OnConnectionFailedListener, ServiceCallBack {
 
-    public static final int DEFAULT_ZOOM = 15;
-    public static final int STATION_ZOOM = 9;
+    public static final float DEFAULT_ZOOM = 15;
+    public static final float STATION_ZOOM = 9.5f;
+    public static final String CURRENT_LOCALITY = "current";
+    public static final String INPUT = "input";
+    public static final String ME = "me";
+    public static final String BART = "bart";
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String LAST_UPDATE_TIME = "updateTime";
     private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
@@ -74,7 +79,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
-    LocationManager mLocationManager;
     Location mCurrentLocation;
     Marker mMarker;
     String mLastUpdateTime;
@@ -83,10 +87,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     StationListFragment mListFragment;
     BartService mService;
     FragmentManager mManager;
-    //SharedPreferences mSharedPreference;
     //TODO: KEY CHECKING
     boolean mMePressed = true;
-    boolean mBartPressed = true;
+    boolean mBartPressed = false;
+    SharedPreferences mPreference;
+
     int[][] colorPattern = new int[][]{new int[]{Color.parseColor("#FF4081")}, new int[]{Color.parseColor("#366792")}};
     ColorStateList pink = new ColorStateList(colorPattern, colorPattern[0]);
     ColorStateList blue = new ColorStateList(colorPattern, colorPattern[1]);
@@ -116,9 +121,14 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     (CURRENT_LOCATION);
             if (savedInstanceState.containsKey(LAST_UPDATE_TIME)) mLastUpdateTime = savedInstanceState.getString
                     (LAST_UPDATE_TIME);
+            if (savedInstanceState.containsKey(CURRENT_LOCALITY))
+                mLocality = savedInstanceState.getString(CURRENT_LOCALITY);
         }
         mService = new BartService(getActivity(), this);
+        //TODO
         mMapInput = (EditText) getActivity().findViewById(R.id.mapInput);
+        mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if (mPreference.contains(INPUT)) mMapInput.setText(mPreference.getString(INPUT, ""));
         mMapInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -137,6 +147,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mMeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mBartPressed = false;
                 try {
                     goToCurrentLocation();
                 } catch (IOException e) {
@@ -152,6 +163,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             @Override
             public void onClick(View v) {
                 mService.getStationInfo();
+                mBartPressed = true;
             }
         });
     }
@@ -168,6 +180,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         super.onStop();
         MapStateManager manager = new MapStateManager(getActivity());
         manager.saveMapState(mMap);
+        SharedPreferences.Editor editor = mPreference.edit();
+        editor.putString(INPUT, mMapInput.getText().toString());
+        editor.putBoolean(ME, mMePressed);
+        editor.putBoolean(BART, mBartPressed);
+        editor.apply();
     }
 
     private boolean serviceAvailable() {
@@ -317,10 +334,22 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 Log.i("LatLng", "Location:" + location.getLatitude() + location.getLongitude());
             }
         });
-        try {
-            goToCurrentLocation();
-        } catch (IOException e) {
-            e.printStackTrace();
+        MapStateManager manager = new MapStateManager(getActivity());
+        CameraPosition position = manager.getSavedCameraPosition();
+        if (position != null) {
+            CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
+            mMap.moveCamera(update);
+            double lat = manager.getLatitude();
+            double lng = manager.getLongitude();
+            mLatLng = new LatLng(lat, lng);
+            setStartMarker(mLocality, lat, lng);
+            mService.getStationInfo();
+        } else {
+            try {
+                goToCurrentLocation();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         mDialog.dismiss();
     }
@@ -337,9 +366,10 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putParcelable(CURRENT_LOCATION, mCurrentLocation);
         outState.putString(LAST_UPDATE_TIME, mLastUpdateTime);
+        outState.putString(CURRENT_LOCALITY, mLocality);
+        super.onSaveInstanceState(outState);
     }
 
     void setStartMarker(String locality, double lat, double lng) {
@@ -378,9 +408,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mListFragment = new StationListFragment();
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
         //TODO:
-        setEndMarker(Station.data);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(mLatLng, STATION_ZOOM);
-        mMap.animateCamera(update);
+        if (mPreference.getBoolean(BART, false) || mBartPressed) {
+            setEndMarker(Station.data);
+            CameraUpdate update = CameraUpdateFactory.newLatLngZoom(mLatLng, STATION_ZOOM);
+            mMap.animateCamera(update);
+        }
         dialog.dismiss();
     }
 
@@ -389,3 +421,4 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         dialog.dismiss();
     }
 }
+

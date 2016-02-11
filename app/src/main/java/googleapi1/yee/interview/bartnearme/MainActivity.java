@@ -1,17 +1,12 @@
 package googleapi1.yee.interview.bartnearme;
 
 import android.app.FragmentManager;
-import android.app.ProgressDialog;
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
+import android.widget.Toast;
 
-import googleapi1.yee.interview.bartnearme.CallBack.MapCallBack;
-import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
 import googleapi1.yee.interview.bartnearme.Fragment.GoogleMapFragment;
-import googleapi1.yee.interview.bartnearme.Fragment.StationListFragment;
-import googleapi1.yee.interview.bartnearme.Service.BartService;
 
 /**
  * Created by Yee on 2/2/16.
@@ -20,18 +15,12 @@ public class MainActivity extends FragmentActivity {
 
     android.support.v4.app.FragmentManager mSupportManager;
     FragmentManager mManager;
-    //GoogleMapFragment1 mGoogleMapFragment;
     GoogleMapFragment mGoogleMapFragment;
-    StationListFragment mListFragment;
-    //StationDetailsFragment mDetailsFragment;
-    //FloatingActionButton mMeButton;
-    FloatingActionButton mBartButton;
-    BartService mService;
-    ServiceCallBack mCallback;
-    ProgressDialog mDialog;
-    MapCallBack mMapCallBack;
-    //List<Station> mData;
-    SharedPreferences mSharedPreference;
+
+    public static void makeToast(Context context, String str) {
+        Toast.makeText(context, str, Toast.LENGTH_SHORT).show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
