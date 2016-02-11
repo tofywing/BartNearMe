@@ -102,7 +102,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
         if (serviceAvailable()) {
-            view = inflater.inflate(R.layout.map_fragment, container, false);
+            view = inflater.inflate(R.layout.google_map_fragment, container, false);
             initMap();
         } else {
             Toast.makeText(getActivity(), getText(R.string.service_unavailable), Toast.LENGTH_LONG).show();
