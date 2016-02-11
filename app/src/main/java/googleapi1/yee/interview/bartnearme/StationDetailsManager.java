@@ -2,6 +2,7 @@ package googleapi1.yee.interview.bartnearme;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
  * Created by Yee on 2/10/16.
@@ -16,20 +17,23 @@ public class StationDetailsManager {
     public static final String ZIP = "zip";
     public SharedPreferences mSharedPreferences;
 
-
     public StationDetailsManager(Context context) {
         mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
     }
 
     public void saveStationDetails(Station station) {
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(NAME, station.getName());
-        editor.putString(DISTANCE, station.getDistance());
-        editor.putString(ADDRESS, station.getAddress());
-        editor.putString(CITY, station.getCity());
-        editor.putString(STATE, station.getState());
-        editor.putString(ZIP, station.getZipCode());
-        editor.apply();
+        if (station != null) {
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString(NAME, station.getName());
+            editor.putString(DISTANCE, station.getDistance());
+            editor.putString(ADDRESS, station.getAddress());
+            editor.putString(CITY, station.getCity());
+            editor.putString(STATE, station.getState());
+            editor.putString(ZIP, station.getZipCode());
+            editor.apply();
+        } else {
+            Log.i("not save", "station is null");
+        }
     }
 
     public Station getSavedStation() {
