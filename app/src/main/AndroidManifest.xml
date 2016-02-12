@@ -9,6 +9,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
+    <permission
+        android:name="googleapi1.yee.interview.bartnearme"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="googleapi1.yee.interview.bartnearme"/>
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/logo"
