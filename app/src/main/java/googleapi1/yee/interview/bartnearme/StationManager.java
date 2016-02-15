@@ -22,7 +22,8 @@ public class StationManager {
     }
 
     public double getDistance(LatLng StartP, LatLng EndP) {
-        int Radius = 6371;// radius of earth in Km
+        // radius of earth in Km
+        int Radius = 6371;
         double lat1 = StartP.latitude;
         double lat2 = EndP.latitude;
         double lon1 = StartP.longitude;

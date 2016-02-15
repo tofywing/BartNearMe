@@ -8,7 +8,7 @@ import android.util.Log;
  * Created by Yee on 2/10/16.
  */
 public class StationDetailsManager {
-    public static final String TAG = "stationDetailedFragment";
+    public static final String STATION_STATE = "stationDetailedFragment";
     public static final String NAME = "name";
     public static final String DISTANCE = "distance";
     public static final String ADDRESS = "address";
@@ -18,7 +18,7 @@ public class StationDetailsManager {
     public SharedPreferences mSharedPreferences;
 
     public StationDetailsManager(Context context) {
-        mSharedPreferences = context.getSharedPreferences(TAG, Context.MODE_PRIVATE);
+        mSharedPreferences = context.getSharedPreferences(STATION_STATE, Context.MODE_PRIVATE);
     }
 
     public void saveStationDetails(Station station) {

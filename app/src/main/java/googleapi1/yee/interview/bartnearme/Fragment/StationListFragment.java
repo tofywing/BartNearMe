@@ -2,6 +2,7 @@ package googleapi1.yee.interview.bartnearme.Fragment;
 
 import android.app.FragmentManager;
 import android.app.ListFragment;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import googleapi1.yee.interview.bartnearme.Adapter.StationAdapter;
+import googleapi1.yee.interview.bartnearme.MainActivity;
 import googleapi1.yee.interview.bartnearme.R;
 import googleapi1.yee.interview.bartnearme.Station;
 import googleapi1.yee.interview.bartnearme.StationDetailsManager;
@@ -34,6 +36,7 @@ public class StationListFragment extends ListFragment {
         StationDetailsManager manager = new StationDetailsManager(getActivity());
         mStation = manager.getSavedStation();
         if (mStation != null) {
+            MainActivity.makeToast(getActivity(), "stations");
             mDetailFragment = StationDetailsFragment.newInstance(mStation);
             mManager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();
         }
@@ -60,8 +63,18 @@ public class StationListFragment extends ListFragment {
 
     @Override
     public void onStop() {
+        super.onStop();
         if (mDetailFragment != null && mDetailFragment.isAdded())
             mManager.beginTransaction().remove(mDetailFragment).commitAllowingStateLoss();
-        super.onStop();
+    }
+
+
+    //TODO: onConfigurationChanged
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        MainActivity.makeToast(getActivity(), "list");
+        if (mDetailFragment != null && mDetailFragment.isAdded())
+            mManager.beginTransaction().remove(mDetailFragment).commit();
     }
 }
