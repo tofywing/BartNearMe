@@ -2,7 +2,6 @@ package googleapi1.yee.interview.bartnearme;
 
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
@@ -25,23 +24,10 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
-            setContentView(R.layout
-                    .main_layout_portait);
-        else setContentView(R.layout.main_layout_landscape);
+        setContentView(R.layout.main_layout);
         mSupportManager = getSupportFragmentManager();
         mManager = getFragmentManager();
         mGoogleMapFragment = new GoogleMapFragment();
         mSupportManager.beginTransaction().add(R.id.map, mGoogleMapFragment).commit();
-    }
-
-
-    //TODO: onConfigurationChanged
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        MainActivity.makeToast(this, "activity");
-        if (mGoogleMapFragment != null && mGoogleMapFragment.isAdded()) mSupportManager.beginTransaction().remove
-                (mGoogleMapFragment).commit();
     }
 }

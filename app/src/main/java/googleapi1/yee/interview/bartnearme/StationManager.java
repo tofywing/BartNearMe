@@ -57,7 +57,6 @@ public class StationManager {
         }
         return resultList;
     }
-
     String getDistanceInKM(double distance) {
         return String.format("%.2f km", distance);
     }

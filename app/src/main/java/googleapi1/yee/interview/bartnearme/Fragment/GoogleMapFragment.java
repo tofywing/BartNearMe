@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -53,7 +52,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
-import googleapi1.yee.interview.bartnearme.MainActivity;
 import googleapi1.yee.interview.bartnearme.MapStateManager;
 import googleapi1.yee.interview.bartnearme.R;
 import googleapi1.yee.interview.bartnearme.Service.BartService;
@@ -188,25 +186,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         editor.putBoolean(ME, mMePressed);
         editor.putBoolean(BART, mBartPressed);
         editor.apply();
-    }
-
-
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//
-//        if (mListFragment != null && mListFragment.isAdded())
-//            mManager.beginTransaction().remove(mListFragment).commit();
-//
-//    }
-
-    //TODO: onConfigurationChanged
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        MainActivity.makeToast(getActivity(), "map");
-        if (mListFragment != null && mListFragment.isAdded())
-            mManager.beginTransaction().remove(mListFragment).commit();
     }
 
     private boolean serviceAvailable() {
@@ -429,7 +408,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = new StationListFragment();
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
-        //TODO:
+        //Check the Bart Key press state
         if (mPreference.getBoolean(BART, false) || mBartPressed) {
             setEndMarker(Station.data);
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(mLatLng, STATION_ZOOM);
