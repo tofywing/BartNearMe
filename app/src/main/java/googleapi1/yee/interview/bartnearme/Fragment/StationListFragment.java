@@ -36,6 +36,7 @@ public class StationListFragment extends ListFragment {
         StationDetailsManager manager = new StationDetailsManager(getActivity());
         mStation = manager.getSavedStation();
         if (mStation != null) {
+            //TODO
             MainActivity.makeToast(getActivity(), "stations");
             mDetailFragment = StationDetailsFragment.newInstance(mStation);
             mManager.beginTransaction().add(R.id.stationDetail, mDetailFragment).commit();

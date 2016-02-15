@@ -16,6 +16,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -381,7 +382,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     }
 
     @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
@@ -423,7 +424,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
         StationManager stationManager = new StationManager(list);
-        Station.setData(stationManager.getCloseStationInCount(mLatLng, 5));
+        Station.setData(stationManager.getCloseStationsInCount(mLatLng, 5));
         if (mListFragment != null && mListFragment.isAdded())
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = new StationListFragment();

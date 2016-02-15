@@ -25,7 +25,10 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout_portait);
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+            setContentView(R.layout
+                    .main_layout_portait);
+        else setContentView(R.layout.main_layout_landscape);
         mSupportManager = getSupportFragmentManager();
         mManager = getFragmentManager();
         mGoogleMapFragment = new GoogleMapFragment();

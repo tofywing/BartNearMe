@@ -38,7 +38,7 @@ public class StationManager {
         return Radius * c;
     }
 
-    public List<Station> getCloseStationInCount(LatLng start, int count) {
+    public List<Station> getCloseStationsInCount(LatLng start, int count) {
         count = Math.min(count, size);
         List<Station> resultList = new ArrayList<>();
         LatLng end;
