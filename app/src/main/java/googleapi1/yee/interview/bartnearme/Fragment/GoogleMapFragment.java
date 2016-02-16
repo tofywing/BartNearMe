@@ -378,7 +378,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mMarker.remove();
         }
         MarkerOptions options = new MarkerOptions().title(locality).position(new LatLng(lat, lng)).icon
-                (BitmapDescriptorFactory.fromResource(R.drawable.small_bart_head));
+                (BitmapDescriptorFactory.defaultMarker());
         mMarker = mMap.addMarker(options);
     }
 
