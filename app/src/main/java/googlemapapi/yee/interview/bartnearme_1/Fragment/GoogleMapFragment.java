@@ -50,6 +50,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import googlemapapi.yee.interview.bartnearme_1.CallBack.ServiceCallBack;
 import googlemapapi.yee.interview.bartnearme_1.MainActivity;
@@ -140,9 +141,26 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_GO) {
                     try {
-                        geoLocate(view);
-                        isBackToMe = true;
-                        isBackToBart = false;
+                        hideSoftKeyBoard(view);
+                        String location = mMapInput.getText().toString();
+                        Geocoder gc = new Geocoder(getActivity());
+                        List<Address> list = gc.getFromLocationName(location, 1);
+                        if (list.size() != 0) {
+                            geoLocate(list.get(0));
+                            isBackToMe = true;
+                            isBackToBart = false;
+                        } else {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                            alert.setMessage(getText(R.string.alter_wrong_input));
+                            alert.setCancelable(false);
+                            alert.setNegativeButton(getText(R.string.alter_button_comfirm), new DialogInterface
+                                    .OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            }).show();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -151,43 +169,53 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             }
         });
         mMeButton = (FloatingActionButton) getActivity().findViewById(R.id.findMe);
+
         mMeButton.setBackgroundTintList(pink);
         mMeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isBartPressed = false;
-                isBackToMe = true;
-                isBackToBart = false;
-                try {
-                    goToCurrentLocation();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                                         @Override
+                                         public void onClick(View v) {
+                                             isBartPressed = false;
+                                             isBackToMe = true;
+                                             isBackToBart = false;
+                                             try {
+                                                 goToCurrentLocation();
+                                             } catch (IOException e) {
+                                                 e.printStackTrace();
+                                             }
+                                         }
+                                     }
+
+        );
         mBartButton = (FloatingActionButton) getActivity().findViewById(R.id.findBart);
+
         mBartButton.setBackgroundTintList(blue);
-        mListFragment = new StationListFragment();
+        mListFragment = StationListFragment.newInstance(null);
         mManager = getActivity().getFragmentManager();
         mBartButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mService.getStationInfo();
-                isBartPressed = true;
-                isBackToBart = true;
-                isBackToMe = false;
-            }
-        });
+                                           @Override
+                                           public void onClick(View v) {
+                                               mService.getStationInfo();
+                                               isBartPressed = true;
+                                               isBackToBart = true;
+                                               isBackToMe = false;
+                                           }
+                                       }
+
+        );
         mBackButton = (FloatingActionButton) getActivity().findViewById(R.id.back);
         mBackButton.setBackgroundTintList(yellow);
         mBackButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mPositionManager.getLatitude
-                        (), mPositionManager.getLongitude()), isBackToMe ? DEFAULT_ZOOM : STATION_ZOOM);
-                mMap.animateCamera(cameraUpdate);
-            }
-        });
+                                           @Override
+                                           public void onClick(View v) {
+                                               CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new
+                                                       LatLng(mPositionManager.getLatitude
+                                                       (), mPositionManager.getLongitude()), isBackToMe ?
+                                                       DEFAULT_ZOOM : STATION_ZOOM);
+                                               mMap.animateCamera(cameraUpdate);
+                                           }
+                                       }
+
+        );
     }
 
     @Override
@@ -239,6 +267,46 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     Snackbar.make(getView(), getText(R.string.service_ready), Snackbar
                             .LENGTH_SHORT).show();
                     mMap = map;
+
+
+                    //TODO On MAP CLICK
+                    mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                        @Override
+                        public void onMapClick(LatLng latLng) {
+                            try {
+                                if (mMarker != null) {
+                                    mMarker.remove();
+                                }
+                                Geocoder gc = new Geocoder(getActivity());
+                                List<Address> addresses = gc.getFromLocation(latLng.latitude, latLng
+                                        .longitude, 1);
+                                Address address = addresses.get(0);
+                                MarkerOptions options = new MarkerOptions().title(address.getLocality())
+                                        .position(latLng)
+                                        .icon(BitmapDescriptorFactory.defaultMarker());
+                                mMarker = mMap.addMarker(options);
+                                geoLocate(address);
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+
+                    //TODO On Marker CLICK
+                    mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                        @Override
+                        public boolean onMarkerClick(Marker marker) {
+
+                            if (mListFragment != null && mListFragment.isAdded())
+                                mManager.beginTransaction().remove(mListFragment).commit();
+                            mListFragment = StationListFragment.newInstance(getSelectedStation(Station.data, marker
+                                    .getTitle()));
+                            mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
+                            return false;
+                        }
+                    });
                     mDialog.dismiss();
                 } else {
                     Snackbar.make(getView(), getText(R.string.service_ready), Snackbar
@@ -276,9 +344,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         }
         mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mCurrentLocation != null) {
-            Geocoder gc = new Geocoder(getActivity());
             double lat = mCurrentLocation.getLatitude();
             double lng = mCurrentLocation.getLongitude();
+            Geocoder gc = new Geocoder(getActivity());
             List<Address> addresses = gc.getFromLocation(lat, lng, 1);
             Address address = addresses.get(0);
             mLocality = address.getLocality();
@@ -294,34 +362,18 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         }
     }
 
-    public void geoLocate(View view) throws IOException {
-        hideSoftKeyBoard(view);
-        String location = mMapInput.getText().toString();
-        Geocoder gc = new Geocoder(getActivity());
-        List<Address> list = gc.getFromLocationName(location, 1);
-        if (list.size() != 0) {
-            Address address = list.get(0);
-            if (address != null) {
-                double lat = address.getLatitude();
-                double lng = address.getLongitude();
-                goToLocation(lat, lng, DEFAULT_ZOOM);
-                mLocality = address.getLocality();
-                setStartMarker(mLocality, lat, lng);
-            }
+    public void geoLocate(Address address) throws IOException {
+        if (address != null) {
+            double lat = address.getLatitude();
+            double lng = address.getLongitude();
+            goToLocation(lat, lng, DEFAULT_ZOOM);
+            mLocality = address.getLocality();
+            setStartMarker(mLocality, lat, lng);
             //TODO
             mPositionManager.saveMapPosition(address, ICON_PATH);
-        } else {
-            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-            alert.setMessage(getText(R.string.alter_wrong_input));
-            alert.setCancelable(false);
-            alert.setNegativeButton(getText(R.string.alter_button_comfirm), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            }).show();
         }
     }
+
 
     private void hideSoftKeyBoard(View view) {
         InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -372,9 +424,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             double lat = mPositionManager.getLatitude();
             double lng = mPositionManager.getLongitude();
             mLatLng = new LatLng(lat, lng);
-
             setStartMarker(mPositionManager.getLocality(), lat, lng);
-            //mService.getStationInfo();
+            if (Station.data != null) setEndMarker(Station.data);
+            mService.getStationInfo();
         } else {
             try {
                 goToCurrentLocation();
@@ -435,7 +487,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         Station.setData(stationManager.getCloseStationsInCount(mLatLng, 5));
         if (mListFragment != null && mListFragment.isAdded())
             mManager.beginTransaction().remove(mListFragment).commit();
-        mListFragment = new StationListFragment();
+        mListFragment = StationListFragment.newInstance(null);
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
         //Check the Bart Key press state
         if (mPreference.getBoolean(BART, false) || isBartPressed) {
@@ -450,5 +502,19 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public void onActionFailed(Exception e, ProgressDialog dialog) {
         dialog.dismiss();
     }
+
+    private Station getSelectedStation(List<Station> stations, String name) {
+        for (Station station : stations) {
+            if (station.getName().equals(name)) return station;
+        }
+        return null;
+    }
+
+    Address getAddress(double lat, double lng) throws IOException {
+        Geocoder gc = new Geocoder(getActivity());
+        List<Address> addresses = gc.getFromLocation(lat, lng, 1);
+        return addresses.get(0);
+    }
+
 }
 
