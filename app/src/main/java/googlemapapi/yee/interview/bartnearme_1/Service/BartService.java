@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme.Service;
+package googlemapapi.yee.interview.bartnearme_1.Service;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,9 +15,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
-import googleapi1.yee.interview.bartnearme.R;
-import googleapi1.yee.interview.bartnearme.Station;
+import googlemapapi.yee.interview.bartnearme_1.CallBack.ServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.Station;
+import googleapi1.yee.interview.bartnearme_1.R;
 
 /**
  * Created by Yee on 2/4/16.

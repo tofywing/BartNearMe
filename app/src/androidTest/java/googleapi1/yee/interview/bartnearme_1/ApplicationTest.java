@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme;
+package googleapi1.yee.interview.bartnearme_1;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

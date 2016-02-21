@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme.Fragment;
+package googlemapapi.yee.interview.bartnearme_1.Fragment;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -51,12 +51,14 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import googleapi1.yee.interview.bartnearme.CallBack.ServiceCallBack;
-import googleapi1.yee.interview.bartnearme.MapStateManager;
-import googleapi1.yee.interview.bartnearme.R;
-import googleapi1.yee.interview.bartnearme.Service.BartService;
-import googleapi1.yee.interview.bartnearme.Station;
-import googleapi1.yee.interview.bartnearme.StationManager;
+import googlemapapi.yee.interview.bartnearme_1.CallBack.ServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.MainActivity;
+import googlemapapi.yee.interview.bartnearme_1.MapPositionManager;
+import googlemapapi.yee.interview.bartnearme_1.MapStateManager;
+import googleapi1.yee.interview.bartnearme_1.R;
+import googlemapapi.yee.interview.bartnearme_1.Service.BartService;
+import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.StationManager;
 
 /**
  * Created by Yee on 2/5/16.
@@ -70,32 +72,42 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public static final String INPUT = "input";
     public static final String ME = "me";
     public static final String BART = "bart";
+    public static final String BACK_ME = "BackTome";
+    public static final String BACK_BART = "BackTobart";
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String LAST_UPDATE_TIME = "updateTime";
+
+    //TODO:
+    private static final String ICON_PATH = "iconPath";
     private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
     EditText mMapInput;
     FloatingActionButton mMeButton;
     FloatingActionButton mBartButton;
+    FloatingActionButton mBackButton;
     ProgressDialog mDialog;
     GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     Location mCurrentLocation;
     Marker mMarker;
-    String mLastUpdateTime;
     //city
     String mLocality;
     StationListFragment mListFragment;
     BartService mService;
     FragmentManager mManager;
+    MapPositionManager mPositionManager;
     //TODO: KEY CHECKING
-    boolean mMePressed = true;
-    boolean mBartPressed = false;
+    boolean isMePressed = true;
+    boolean isBartPressed = false;
+    boolean isBackToMe = true;
+    boolean isBackToBart = false;
     SharedPreferences mPreference;
 
-    int[][] colorPattern = new int[][]{new int[]{Color.parseColor("#FF4081")}, new int[]{Color.parseColor("#366792")}};
+    int[][] colorPattern = new int[][]{new int[]{Color.parseColor("#FF4081")}, new int[]{Color.parseColor("#366792")
+    }, new int[]{Color.parseColor("#F0EB5A")}};
     ColorStateList pink = new ColorStateList(colorPattern, colorPattern[0]);
     ColorStateList blue = new ColorStateList(colorPattern, colorPattern[1]);
+    ColorStateList yellow = new ColorStateList(colorPattern, colorPattern[2]);
     LatLng mLatLng;
     List<Marker> mMarkerList = null;
 
@@ -117,15 +129,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey(CURRENT_LOCATION)) mCurrentLocation = savedInstanceState.getParcelable
-                    (CURRENT_LOCATION);
-            if (savedInstanceState.containsKey(LAST_UPDATE_TIME)) mLastUpdateTime = savedInstanceState.getString
-                    (LAST_UPDATE_TIME);
-            if (savedInstanceState.containsKey(CURRENT_LOCALITY))
-                mLocality = savedInstanceState.getString(CURRENT_LOCALITY);
-        }
         mService = new BartService(getActivity(), this);
+        mPositionManager = new MapPositionManager(getActivity());
         //TODO
         mMapInput = (EditText) getActivity().findViewById(R.id.mapInput);
         mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
@@ -136,6 +141,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 if (actionId == EditorInfo.IME_ACTION_GO) {
                     try {
                         geoLocate(view);
+                        isBackToMe = true;
+                        isBackToBart = false;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -148,7 +155,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mMeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mBartPressed = false;
+                isBartPressed = false;
+                isBackToMe = true;
+                isBackToBart = false;
                 try {
                     goToCurrentLocation();
                 } catch (IOException e) {
@@ -164,7 +173,19 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             @Override
             public void onClick(View v) {
                 mService.getStationInfo();
-                mBartPressed = true;
+                isBartPressed = true;
+                isBackToBart = true;
+                isBackToMe = false;
+            }
+        });
+        mBackButton = (FloatingActionButton) getActivity().findViewById(R.id.back);
+        mBackButton.setBackgroundTintList(yellow);
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mPositionManager.getLatitude
+                        (), mPositionManager.getLongitude()), isBackToMe ? DEFAULT_ZOOM : STATION_ZOOM);
+                mMap.animateCamera(cameraUpdate);
             }
         });
     }
@@ -183,8 +204,10 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         manager.saveMapState(mMap);
         SharedPreferences.Editor editor = mPreference.edit();
         editor.putString(INPUT, mMapInput.getText().toString());
-        editor.putBoolean(ME, mMePressed);
-        editor.putBoolean(BART, mBartPressed);
+        editor.putBoolean(ME, isMePressed);
+        editor.putBoolean(BART, isBartPressed);
+        editor.putBoolean(BACK_ME, isBackToMe);
+        editor.putBoolean(BACK_BART, isBackToBart);
         editor.apply();
     }
 
@@ -232,6 +255,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mCurrentLocation = new Location("");
         mCurrentLocation.setLatitude(lat);
         mCurrentLocation.setLatitude(lng);
+
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, zoom);
         mMap.animateCamera(update);
     }
@@ -256,12 +280,15 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             double lat = mCurrentLocation.getLatitude();
             double lng = mCurrentLocation.getLongitude();
             List<Address> addresses = gc.getFromLocation(lat, lng, 1);
-            mLocality = addresses.get(0).getLocality();
+            Address address = addresses.get(0);
+            mLocality = address.getLocality();
             setStartMarker(mLocality, lat, lng);
             LatLng ll = new LatLng(lat, lng);
             mLatLng = ll;
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, DEFAULT_ZOOM);
             mMap.animateCamera(update);
+            //TODO
+            mPositionManager.saveMapPosition(address, ICON_PATH);
         } else {
             Snackbar.make(getView(), getText(R.string.last_location_failed), Snackbar.LENGTH_LONG).show();
         }
@@ -281,6 +308,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 mLocality = address.getLocality();
                 setStartMarker(mLocality, lat, lng);
             }
+            //TODO
+            mPositionManager.saveMapPosition(address, ICON_PATH);
         } else {
             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
             alert.setMessage(getText(R.string.alter_wrong_input));
@@ -340,11 +369,12 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         if (position != null) {
             CameraUpdate update = CameraUpdateFactory.newCameraPosition(position);
             mMap.moveCamera(update);
-            double lat = manager.getLatitude();
-            double lng = manager.getLongitude();
+            double lat = mPositionManager.getLatitude();
+            double lng = mPositionManager.getLongitude();
             mLatLng = new LatLng(lat, lng);
-            setStartMarker(mLocality, lat, lng);
-            mService.getStationInfo();
+
+            setStartMarker(mPositionManager.getLocality(), lat, lng);
+            //mService.getStationInfo();
         } else {
             try {
                 goToCurrentLocation();
@@ -363,14 +393,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(CURRENT_LOCATION, mCurrentLocation);
-        outState.putString(LAST_UPDATE_TIME, mLastUpdateTime);
-        outState.putString(CURRENT_LOCALITY, mLocality);
-        super.onSaveInstanceState(outState);
     }
 
     void setStartMarker(String locality, double lat, double lng) {
@@ -396,6 +418,13 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     .parseDouble(station.getLatitude()), Double.parseDouble(station.getLongitude()))).icon
                     (BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             marker = mMap.addMarker(options);
+//???
+            // ????
+            //
+            //
+
+            // mMarker.setIcon(BitmapDescriptorFactory.fromFile());
+
             mMarkerList.add(marker);
         }
     }
@@ -409,7 +438,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mListFragment = new StationListFragment();
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
         //Check the Bart Key press state
-        if (mPreference.getBoolean(BART, false) || mBartPressed) {
+        if (mPreference.getBoolean(BART, false) || isBartPressed) {
             setEndMarker(Station.data);
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(mLatLng, STATION_ZOOM);
             mMap.animateCamera(update);

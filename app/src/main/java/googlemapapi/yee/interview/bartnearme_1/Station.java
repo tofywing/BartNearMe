@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme;
+package googlemapapi.yee.interview.bartnearme_1;
 
 import android.os.Parcel;
 import android.os.Parcelable;

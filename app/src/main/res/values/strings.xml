@@ -2,6 +2,7 @@
     <string name="app_name">BartNearMe</string>
     <string name="find_me">Me</string>
     <string name="find_bart">Bart</string>
+    <string name="back">Back</string>
     <string name="loading">loading…</string>
     <string name="service_unavailable">Can\u0027t connect to google services</string>
     <string name="service_ready">Ready to Map</string>

@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme.Adapter;
+package googlemapapi.yee.interview.bartnearme_1.Adapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import googleapi1.yee.interview.bartnearme.R;
-import googleapi1.yee.interview.bartnearme.Station;
+import googlemapapi.yee.interview.bartnearme_1.Station;
+import googleapi1.yee.interview.bartnearme_1.R;
 
 /**
  * Created by Yee on 2/4/16.

@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme;
+package googlemapapi.yee.interview.bartnearme_1;
 
 import com.google.android.gms.maps.model.LatLng;
 

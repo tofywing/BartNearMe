@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme;
+package googlemapapi.yee.interview.bartnearme_1;
 
 import android.content.Context;
 import android.content.SharedPreferences;

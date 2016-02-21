@@ -1,4 +1,4 @@
-package googleapi1.yee.interview.bartnearme.Fragment;
+package googlemapapi.yee.interview.bartnearme_1.Fragment;
 
 import android.app.FragmentManager;
 import android.app.ListFragment;
@@ -8,10 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import googleapi1.yee.interview.bartnearme.Adapter.StationAdapter;
-import googleapi1.yee.interview.bartnearme.R;
-import googleapi1.yee.interview.bartnearme.Station;
-import googleapi1.yee.interview.bartnearme.StationDetailsManager;
+import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.StationDetailsManager;
+import googlemapapi.yee.interview.bartnearme_1.Adapter.StationAdapter;
+import googleapi1.yee.interview.bartnearme_1.R;
 
 /**
  * Created by Yee on 2/4/16.

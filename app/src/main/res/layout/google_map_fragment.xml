@@ -10,8 +10,8 @@
         android:id="@+id/up"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:background="@color/bartBlue">
+        android:background="@color/bartBlue"
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/inputTitle"
@@ -40,7 +40,6 @@
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/findMe"
-            xmlns:app="http://schemas.android.com/tools"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"/>
@@ -70,8 +69,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/mapFragment"
-        app:backgroundTint="@color/bartBlue"/>
+        android:layout_alignTop="@id/mapFragment"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -81,6 +79,25 @@
         android:layout_marginTop="19dp"
         android:elevation="7dp"
         android:text="@string/find_bart"
+        android:textColor="@color/pureWhite"
+        android:textSize="14sp"
+        android:textStyle="bold"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/findBart"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/findBart"
+        android:layout_marginTop="19dp"
+        android:elevation="7dp"
+        android:text="@string/back"
         android:textColor="@color/pureWhite"
         android:textSize="14sp"
         android:textStyle="bold"/>
