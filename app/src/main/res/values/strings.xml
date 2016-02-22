@@ -3,7 +3,8 @@
     <string name="find_me">Me</string>
     <string name="find_bart">Bart</string>
     <string name="back">Back</string>
-    <string name="loading">loading…</string>
+    <string name="loading_map">loading map…</string>
+    <string name="loading_weather">loading weather…</string>
     <string name="service_unavailable">Can\u0027t connect to google services</string>
     <string name="service_ready">Ready to Map</string>
     <string name="service_not_ready">Map not available</string>
@@ -20,10 +21,17 @@
     <string name="state">State:</string>
     <string name="zip">Zip:</string>
     <string name="distance">Distance:</string>
+    <string name="weather">Weather:</string>
     <string name="name_unavailable">name unavailable</string>
     <string name="address_unavailable">address unavailable</string>
     <string name="city_unavailable">city unavailable</string>
     <string name="state_unavailable">state unavailable</string>
     <string name="zip_unavailable">zip unavailable</string>
     <string name="distance_unavailable">zip unavailable</string>
+    <string name="service_error">Please check your data service.</string>
+    <string name="no_city_alert">Please check the city input</string>
+    <string name="no_state_alert">Please check the state input</string>
+    <string name="general_input_error_alert">Please check your input</string>
+    <string name="city_state_not_match_alert">City and state are not matched</string>
+    <string name="confirm_alert">Confirm</string>
 </resources>

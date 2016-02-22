@@ -15,8 +15,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import googlemapapi.yee.interview.bartnearme_1.CallBack.ServiceCallBack;
-import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.CallBack.BartServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.Data.Station;
 import googleapi1.yee.interview.bartnearme_1.R;
 
 /**
@@ -25,11 +25,11 @@ import googleapi1.yee.interview.bartnearme_1.R;
 public class BartService {
 
     Context mContext;
-    ServiceCallBack mCallBack;
+    BartServiceCallBack mCallBack;
     private final String BART_STATION_URL = "http://api.bart.gov/api/stn.aspx?cmd=stns&key=MW9S-E7SL-26DU-VV8V";
     ProgressDialog mDialog;
 
-    public BartService(Context context, ServiceCallBack callBack) {
+    public BartService(Context context, BartServiceCallBack callBack) {
         mContext = context;
         mCallBack = callBack;
     }
@@ -59,8 +59,8 @@ public class BartService {
             protected void onPostExecute(List<Station> data) {
                 super.onPostExecute(data);
                 // Not defined the exception yet
-                if (data.size() == 0) mCallBack.onActionFailed(new Exception(), mDialog);
-                else mCallBack.onActionSuccess(data, mDialog);
+                if (data.size() == 0) mCallBack.onMapActionFailed(new Exception(), mDialog);
+                else mCallBack.onMapActionSuccess(data, mDialog);
             }
         }.execute();
     }
@@ -121,7 +121,7 @@ public class BartService {
 
     void showDialog(Context context) {
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.loading));
+        mDialog.setMessage(context.getString(R.string.loading_map));
         mDialog.setCancelable(false);
         mDialog.show();
     }

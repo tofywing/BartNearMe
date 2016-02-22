@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.Data.Station;
 import googleapi1.yee.interview.bartnearme_1.R;
 
 /**

@@ -1,14 +1,16 @@
-package googlemapapi.yee.interview.bartnearme_1;
+package googlemapapi.yee.interview.bartnearme_1.Data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import org.json.JSONObject;
 
 import java.util.List;
 
 /**
  * Created by Yee on 2/4/16.
  */
-public class Station implements Parcelable {
+public class Station implements Parcelable, ParseData {
     //Creator of Parcel
     public static final Creator<Station> CREATOR = new Creator<Station>() {
         @Override
@@ -31,10 +33,13 @@ public class Station implements Parcelable {
     String latitude;
     String longitude;
     String distance;
+    String day;
+    String date;
+    String tempHigh;
+    String tempLow;
+    String tempInGeneral;
 
-    public Station() {
-
-    }
+    public Station() {}
 
     //Constructor invoked by Creator of Parcel
     protected Station(Parcel in) {
@@ -128,6 +133,46 @@ public class Station implements Parcelable {
         this.distance = distance;
     }
 
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public void setTempHigh(String tempHigh) {
+        this.tempHigh = tempHigh;
+    }
+
+    public void setTempLow(String tempLow) {
+        this.tempLow = tempLow;
+    }
+
+    public void setTempInGeneral(String tempInGeneral) {
+        this.tempInGeneral = tempInGeneral;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public String getDay() {
+        return day;
+    }
+
+    public String getTempHigh() {
+        return tempHigh;
+    }
+
+    public String getTempLow() {
+        return tempLow;
+    }
+
+    public String getTempInGeneral() {
+        return tempInGeneral;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -143,5 +188,19 @@ public class Station implements Parcelable {
         dest.writeString(zipCode);
         dest.writeString(latitude);
         dest.writeString(longitude);
+        dest.writeString(day);
+        dest.writeString(date);
+        dest.writeString(tempHigh);
+        dest.writeString(tempLow);
+        dest.writeString(tempInGeneral);
+    }
+
+    @Override
+    public void parseJSON(JSONObject object) {
+        this.day = object.optString("day");
+        this.date = object.optString("date");
+        this.tempHigh = String.valueOf(object.optInt("high"));
+        this.tempLow = String.valueOf(object.optInt("low"));
+        this.tempInGeneral = object.optString("text");
     }
 }

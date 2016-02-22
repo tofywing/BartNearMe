@@ -47,25 +47,35 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
-import googlemapapi.yee.interview.bartnearme_1.CallBack.ServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.CallBack.BartServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.CallBack.YahooWeatherServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.Data.Channel;
+import googlemapapi.yee.interview.bartnearme_1.Data.Forecast;
 import googlemapapi.yee.interview.bartnearme_1.MainActivity;
 import googlemapapi.yee.interview.bartnearme_1.MapPositionManager;
 import googlemapapi.yee.interview.bartnearme_1.MapStateManager;
 import googleapi1.yee.interview.bartnearme_1.R;
 import googlemapapi.yee.interview.bartnearme_1.Service.BartService;
-import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.Data.Station;
+import googlemapapi.yee.interview.bartnearme_1.Service.WeatherService;
 import googlemapapi.yee.interview.bartnearme_1.StationManager;
 
 /**
  * Created by Yee on 2/5/16.
  */
 public class GoogleMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient
-        .OnConnectionFailedListener, ServiceCallBack {
+        .OnConnectionFailedListener, BartServiceCallBack, YahooWeatherServiceCallBack {
 
     public static final float DEFAULT_ZOOM = 15;
     public static final float STATION_ZOOM = 9.5f;
@@ -93,8 +103,17 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     Marker mMarker;
     //city
     String mLocality;
+
+
+    Station mStation;
+    int mIndex = 0;
+    private static final int STATION_REQUIRED = 5;
+    Map<Integer, Station> mStationWeatherMap = new TreeMap<>();
+
+
     StationListFragment mListFragment;
-    BartService mService;
+    BartService mBartService;
+    WeatherService mWeatherService;
     FragmentManager mManager;
     MapPositionManager mPositionManager;
     //TODO: KEY CHECKING
@@ -115,22 +134,20 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
+        view = inflater.inflate(R.layout.google_map_fragment, container, false);
         if (serviceAvailable()) {
-            view = inflater.inflate(R.layout.google_map_fragment, container, false);
             initMap();
         } else {
             Toast.makeText(getActivity(), getText(R.string.service_unavailable), Toast.LENGTH_LONG).show();
-            onDestroy();
-            return null;
         }
-
         return view;
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mService = new BartService(getActivity(), this);
+        mBartService = new BartService(getActivity(), this);
+        mWeatherService = new WeatherService(getActivity(), this);
         mPositionManager = new MapPositionManager(getActivity());
         //TODO
         mMapInput = (EditText) getActivity().findViewById(R.id.mapInput);
@@ -194,7 +211,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mBartButton.setOnClickListener(new View.OnClickListener() {
                                            @Override
                                            public void onClick(View v) {
-                                               mService.getStationInfo();
+                                               mBartService.getStationInfo();
                                                isBartPressed = true;
                                                isBackToBart = true;
                                                isBackToMe = false;
@@ -254,7 +271,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     }
 
     private void initMap() {
-        showDialog(getActivity());
+        showMapDialog(getActivity());
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).addApi(LocationServices.API)
                 .addConnectionCallbacks
                         (this).addOnConnectionFailedListener(this).build();
@@ -298,12 +315,19 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
-
                             if (mListFragment != null && mListFragment.isAdded())
                                 mManager.beginTransaction().remove(mListFragment).commit();
-                            mListFragment = StationListFragment.newInstance(getSelectedStation(Station.data, marker
-                                    .getTitle()));
+                            Station station = getSelectedStation(Station.data, marker
+                                    .getTitle());
+                            mListFragment = StationListFragment.newInstance(station);
                             mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
+//                            if (station != null) {
+//                                mWeatherService.getWeather(station.getCity()+","+station.getState());
+//                            }
+                            if (station != null) {
+//                                MainActivity.makeToast(getActivity(), station.getCity() + "," + station.getState());
+//                                mWeatherService.getWeather(station.getCity() + "," + station.getState());
+                            }
                             return false;
                         }
                     });
@@ -380,16 +404,23 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         manager.hideSoftInputFromInputMethod(view.getWindowToken(), 0);
     }
 
-    void showDialog(Context context) {
+    void showMapDialog(Context context) {
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.loading));
+        mDialog.setMessage(context.getString(R.string.loading_map));
+        mDialog.setCancelable(false);
+        mDialog.show();
+    }
+
+    void showWeatherDialog(Context context) {
+        mDialog = new ProgressDialog(context);
+        mDialog.setMessage(context.getString(R.string.loading_weather));
         mDialog.setCancelable(false);
         mDialog.show();
     }
 
     @Override
     public void onConnected(Bundle bundle) {
-        showDialog(getActivity());
+        showMapDialog(getActivity());
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         //Google suggest production to update location in 60s to save the battery
@@ -426,7 +457,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mLatLng = new LatLng(lat, lng);
             setStartMarker(mPositionManager.getLocality(), lat, lng);
             if (Station.data != null) setEndMarker(Station.data);
-            mService.getStationInfo();
+            mBartService.getStationInfo();
         } else {
             try {
                 goToCurrentLocation();
@@ -482,9 +513,15 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     }
 
     @Override
-    public void onActionSuccess(List<Station> list, ProgressDialog dialog) {
+    public void onMapActionSuccess(List<Station> list, ProgressDialog dialog) {
         StationManager stationManager = new StationManager(list);
-        Station.setData(stationManager.getCloseStationsInCount(mLatLng, 5));
+        Station.setData(stationManager.getCloseStationsInCount(mLatLng, STATION_REQUIRED));
+        mIndex = 0;
+        dialog.dismiss();
+        showWeatherDialog(getActivity());
+        stationGetWeather();
+
+        mWeatherService.getWeather(mStation.getCity() + "," + mStation.getState());
         if (mListFragment != null && mListFragment.isAdded())
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = StationListFragment.newInstance(null);
@@ -495,13 +532,13 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(mLatLng, STATION_ZOOM);
             mMap.animateCamera(update);
         }
-        dialog.dismiss();
     }
 
     @Override
-    public void onActionFailed(Exception e, ProgressDialog dialog) {
+    public void onMapActionFailed(Exception e, ProgressDialog dialog) {
         dialog.dismiss();
     }
+
 
     private Station getSelectedStation(List<Station> stations, String name) {
         for (Station station : stations) {
@@ -510,11 +547,36 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         return null;
     }
 
+    @Override
+    public void onWeatherActionSuccess(Channel channel) {
+        Forecast forecast = new Forecast();
+        forecast.parseJSON(channel.getForecastArray().optJSONObject(0));
+        mStation.setTempLow(forecast.getLow());
+        mStation.setTempHigh(forecast.getHigh());
+        mStation.setTempInGeneral(forecast.getInGeneral());
+        if (mIndex < STATION_REQUIRED) {
+            MainActivity.makeToast(getActivity(), Station.data.get(mIndex).getTempInGeneral() + "," + mIndex);
+            mIndex++;
+            stationGetWeather();
+        } else mDialog.dismiss();
+    }
+
+    @Override
+    public void onWeatherActionFailed(Exception e) {
+
+    }
+
+    void stationGetWeather() {
+        if (mIndex < STATION_REQUIRED) {
+            mStation = Station.data.get(mIndex);
+            mWeatherService.getWeather(mStation.getCity() + "," + mStation.getState());
+        }
+    }
+
     Address getAddress(double lat, double lng) throws IOException {
         Geocoder gc = new Geocoder(getActivity());
         List<Address> addresses = gc.getFromLocation(lat, lng, 1);
         return addresses.get(0);
     }
-
 }
 

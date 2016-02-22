@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import googleapi1.yee.interview.bartnearme_1.R;
-import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.Data.Station;
 
 /**
  * Created by Yee on 2/4/16.

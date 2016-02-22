@@ -8,8 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import googlemapapi.yee.interview.bartnearme_1.MainActivity;
-import googlemapapi.yee.interview.bartnearme_1.Station;
+import googlemapapi.yee.interview.bartnearme_1.Data.Station;
 import googlemapapi.yee.interview.bartnearme_1.StationDetailsManager;
 import googlemapapi.yee.interview.bartnearme_1.Adapter.StationAdapter;
 import googleapi1.yee.interview.bartnearme_1.R;
