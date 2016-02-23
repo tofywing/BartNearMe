@@ -69,7 +69,8 @@ public class StationManager {
         return mResultStations;
     }
 
+    //No km unit
     String getDistanceInKM(double distance) {
-        return String.format("%.2f km", distance);
+        return String.format("%.2f", distance);
     }
 }

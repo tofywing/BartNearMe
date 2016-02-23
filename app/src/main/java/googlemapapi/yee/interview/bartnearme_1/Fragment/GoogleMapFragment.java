@@ -91,6 +91,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     //TODO:
     private static final String ICON_PATH = "iconPath";
     private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
+    private static final int STATION_REQUIRED = 5;
+    private static final int SATISFY_DISTANCE = 25;
     EditText mMapInput;
     FloatingActionButton mMeButton;
     FloatingActionButton mBartButton;
@@ -107,7 +109,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     Station mStation;
     int mIndex = 0;
-    private static final int STATION_REQUIRED = 5;
     Map<Integer, Station> mStationWeatherMap = new TreeMap<>();
 
 
@@ -168,9 +169,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                             isBackToBart = false;
                         } else {
                             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                            alert.setMessage(getText(R.string.alter_wrong_input));
+                            alert.setMessage(getText(R.string.alert_wrong_input));
                             alert.setCancelable(false);
-                            alert.setNegativeButton(getText(R.string.alter_button_comfirm), new DialogInterface
+                            alert.setNegativeButton(getText(R.string.alert_button_comfirm), new DialogInterface
                                     .OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -506,9 +507,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public void onMapActionSuccess(List<Station> list, ProgressDialog dialog) {
         StationManager stationManager = new StationManager(list);
         Station.setData(stationManager.getCloseStationsInCount(mLatLng, STATION_REQUIRED));
-        if (Station.data != null) setEndMarker(Station.data);
         mIndex = 0;
         dialog.dismiss();
+
         showWeatherDialog(getActivity());
         stationGetWeather();
         mWeatherService.getWeather(mStation.getCity() + "," + mStation.getState());
@@ -548,7 +549,24 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         if (mIndex < STATION_REQUIRED) {
             mIndex++;
             stationGetWeather();
-        } else mDialog.dismiss();
+        } else {
+
+            if (Station.data != null) {
+                String distance = Station.data.get(0).getDistance();
+                if ((Float.parseFloat(distance)) >= SATISFY_DISTANCE) {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                    alert.setMessage(getString(R.string.alert_too_far, distance));
+                    alert.setNegativeButton(R.string.confirm_alert, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
+                }
+                setEndMarker(Station.data);
+            }
+            mDialog.dismiss();
+        }
     }
 
     @Override

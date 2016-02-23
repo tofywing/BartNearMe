@@ -12,8 +12,10 @@
     <string name="input_title">Location:</string>
     <string name="input_hint">Manually input location</string>
     <string name="last_location_failed">Can\u0027t find your location</string>
-    <string name="alter_wrong_input">No result matched your input address</string>
-    <string name="alter_button_comfirm">Yup</string>
+    <string name="alert_wrong_input">No result matched your input address</string>
+    <string name="alert_too_far">The most close Bart station is %s km around you."\n"Would you still want to
+        go anyway?</string>
+    <string name="alert_button_comfirm">Yup</string>
     <string name="no_stations_found">No stations found</string>
     <string name="name">Name:</string>
     <string name="address">Address:</string>
