@@ -1,6 +1,9 @@
 # BartNearMe
-Find the Top 5 Bart Stations most close to you
 
-Google maps API, Bart API(Restful Webservice(XML API))
+•	Find 5 Bart stations the most close to either you or your input location or anywhere of the map you touch;
 
-The UI still have much space to improve user experience but how ever it is Pretty Fun, enjoy :)
+•	Provide the detailed Bart station information including official Bart station name and position and address;
+
+•	Provide the weather information to each Bart station selected. 
+
+
