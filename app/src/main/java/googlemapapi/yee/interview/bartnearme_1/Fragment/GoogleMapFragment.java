@@ -201,7 +201,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                              }
                                          }
                                      }
-
         );
         mBartButton = (FloatingActionButton) getActivity().findViewById(R.id.findBart);
 
@@ -217,7 +216,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                                isBackToMe = false;
                                            }
                                        }
-
         );
         mBackButton = (FloatingActionButton) getActivity().findViewById(R.id.back);
         mBackButton.setBackgroundTintList(yellow);
@@ -231,7 +229,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                                mMap.animateCamera(cameraUpdate);
                                            }
                                        }
-
         );
     }
 
@@ -310,23 +307,17 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                         }
                     });
 
-
                     //TODO On Marker CLICK
                     mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                         @Override
                         public boolean onMarkerClick(Marker marker) {
                             if (mListFragment != null && mListFragment.isAdded())
                                 mManager.beginTransaction().remove(mListFragment).commit();
-                            Station station = getSelectedStation(Station.data, marker
+                            final Station station = getSelectedStation(Station.data, marker
                                     .getTitle());
                             mListFragment = StationListFragment.newInstance(station);
                             mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
-//                            if (station != null) {
-//                                mWeatherService.getWeather(station.getCity()+","+station.getState());
-//                            }
                             if (station != null) {
-//                                MainActivity.makeToast(getActivity(), station.getCity() + "," + station.getState());
-//                                mWeatherService.getWeather(station.getCity() + "," + station.getState());
                             }
                             return false;
                         }
@@ -456,7 +447,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             double lng = mPositionManager.getLongitude();
             mLatLng = new LatLng(lat, lng);
             setStartMarker(mPositionManager.getLocality(), lat, lng);
-            if (Station.data != null) setEndMarker(Station.data);
             mBartService.getStationInfo();
         } else {
             try {
@@ -516,11 +506,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public void onMapActionSuccess(List<Station> list, ProgressDialog dialog) {
         StationManager stationManager = new StationManager(list);
         Station.setData(stationManager.getCloseStationsInCount(mLatLng, STATION_REQUIRED));
+        if (Station.data != null) setEndMarker(Station.data);
         mIndex = 0;
         dialog.dismiss();
         showWeatherDialog(getActivity());
         stationGetWeather();
-
         mWeatherService.getWeather(mStation.getCity() + "," + mStation.getState());
         if (mListFragment != null && mListFragment.isAdded())
             mManager.beginTransaction().remove(mListFragment).commit();
@@ -554,8 +544,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mStation.setTempLow(forecast.getLow());
         mStation.setTempHigh(forecast.getHigh());
         mStation.setTempInGeneral(forecast.getInGeneral());
+        mStation.setCode(forecast.getCode());
         if (mIndex < STATION_REQUIRED) {
-            MainActivity.makeToast(getActivity(), Station.data.get(mIndex).getTempInGeneral() + "," + mIndex);
             mIndex++;
             stationGetWeather();
         } else mDialog.dismiss();

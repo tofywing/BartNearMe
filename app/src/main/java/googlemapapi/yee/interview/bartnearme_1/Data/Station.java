@@ -38,6 +38,7 @@ public class Station implements Parcelable, ParseData {
     String tempHigh;
     String tempLow;
     String tempInGeneral;
+    int code;
 
     public Station() {}
 
@@ -173,6 +174,14 @@ public class Station implements Parcelable, ParseData {
         return tempInGeneral;
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -193,6 +202,7 @@ public class Station implements Parcelable, ParseData {
         dest.writeString(tempHigh);
         dest.writeString(tempLow);
         dest.writeString(tempInGeneral);
+        dest.writeInt(code);
     }
 
     @Override
@@ -202,5 +212,6 @@ public class Station implements Parcelable, ParseData {
         this.tempHigh = String.valueOf(object.optInt("high"));
         this.tempLow = String.valueOf(object.optInt("low"));
         this.tempInGeneral = object.optString("text");
+        this.code = object.optInt("code");
     }
 }

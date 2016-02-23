@@ -8,4 +8,140 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:layout_below="@android:id/list"
+        android:background="@color/lineColor"/>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:orientation="vertical">-->
+
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/Current_Location"-->
+            <!--android:textSize="15sp"-->
+            <!--android:textStyle="bold"/>-->
+
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0.1dp"-->
+            <!--android:background="@color/lineColor"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/address"-->
+            <!--android:textSize="13sp"-->
+            <!--android:textStyle="italic"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/address"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:textStyle="bold"/>-->
+
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0.1dp"-->
+            <!--android:background="@color/lineColor"/>-->
+
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="@string/city"-->
+            <!--android:textSize="13sp"-->
+            <!--android:textStyle="italic"/>-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/city"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:textSize="15sp"-->
+            <!--android:textStyle="bold"/>-->
+
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0.1dp"-->
+            <!--android:background="@color/lineColor"/>-->
+
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/stateTitle"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/state"-->
+                <!--android:textSize="13sp"-->
+                <!--android:textStyle="italic"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/state"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/stateTitle"-->
+                <!--android:textSize="15sp"-->
+                <!--android:textStyle="bold"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/zip"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignBottom="@id/state"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:textSize="15sp"-->
+                <!--android:textStyle="bold"/>-->
+
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_above="@id/zip"-->
+                <!--android:layout_alignLeft="@id/zip"-->
+                <!--android:text="@string/zip"-->
+                <!--android:textSize="13sp"-->
+                <!--android:textStyle="italic"/>-->
+
+        <!--</RelativeLayout>-->
+
+        <!--<View-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="0.1dp"-->
+            <!--android:background="@color/lineColor"/>-->
+
+        <!--<RelativeLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content">-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/weatherTitle"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="@string/weather"-->
+                <!--android:textSize="13sp"-->
+                <!--android:textStyle="italic"/>-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/weather"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/weatherTitle"-->
+                <!--android:text="sadfdsf"-->
+                <!--android:textSize="15sp"-->
+                <!--android:textStyle="bold"/>-->
+
+            <!--<ImageView-->
+                <!--android:id="@+id/weatherImage"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentRight="true"/>-->
+
+        <!--</RelativeLayout>-->
+    <!--</LinearLayout>-->
 </RelativeLayout>

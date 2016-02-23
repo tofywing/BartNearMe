@@ -152,15 +152,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:textStyle="bold"
-                android:text="66 - 78 F"/>
+                android:textStyle="bold"/>
 
             <ImageView
                 android:id="@+id/weatherImage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/icon_na"/>
+                android:layout_alignParentRight="true"/>
 
         </RelativeLayout>
 

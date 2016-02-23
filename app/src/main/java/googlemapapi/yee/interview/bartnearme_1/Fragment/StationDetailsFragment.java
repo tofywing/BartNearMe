@@ -1,14 +1,18 @@
 package googlemapapi.yee.interview.bartnearme_1.Fragment;
 
 import android.app.Fragment;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import googleapi1.yee.interview.bartnearme_1.R;
 import googlemapapi.yee.interview.bartnearme_1.Data.Station;
+import googlemapapi.yee.interview.bartnearme_1.MainActivity;
 
 /**
  * Created by Yee on 2/4/16.
@@ -22,6 +26,8 @@ public class StationDetailsFragment extends Fragment {
     TextView mCity;
     TextView mState;
     TextView mZip;
+    TextView mTemperature;
+    ImageView mWeatherImage;
 
     public static StationDetailsFragment newInstance(Station station) {
         Bundle args = new Bundle();
@@ -46,7 +52,8 @@ public class StationDetailsFragment extends Fragment {
         mCity = (TextView) getActivity().findViewById(R.id.city);
         mState = (TextView) getActivity().findViewById(R.id.state);
         mZip = (TextView) getActivity().findViewById(R.id.zip);
-
+        mTemperature = (TextView) getActivity().findViewById(R.id.weather);
+        mWeatherImage = (ImageView) getActivity().findViewById(R.id.weatherImage);
         if (station != null) {
             mName.setText(station.getName());
             mAddress.setText(station.getAddress());
@@ -54,6 +61,13 @@ public class StationDetailsFragment extends Fragment {
             mCity.setText(station.getCity());
             mState.setText(station.getState());
             mZip.setText(station.getZipCode());
+            mTemperature.setText(getString(R.string.temperature, station.getTempLow(), station.getTempHigh()));
+            int resourceId = getResources().getIdentifier("drawable/icon_" + station.getCode(), null, getActivity()
+                    .getPackageName());
+            Drawable drawable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? getResources().getDrawable
+                    (resourceId, getActivity().getTheme()) : getResources().getDrawable
+                    (resourceId);
+            mWeatherImage.setImageDrawable(drawable);
         } else {
             mName.setText(getText(R.string.name_unavailable));
             mDistance.setText(getText(R.string.distance_unavailable));
@@ -61,6 +75,9 @@ public class StationDetailsFragment extends Fragment {
             mCity.setText(getText(R.string.city_unavailable));
             mState.setText(getText(R.string.state_unavailable));
             mZip.setText(getText(R.string.zip_unavailable));
+            mTemperature.setText(R.string.temperature_unavailable);
+            mWeatherImage.setImageDrawable(getResources().getDrawable
+                    (R.drawable.icon_na, getActivity().getTheme()));
         }
     }
 }

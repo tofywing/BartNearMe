@@ -22,12 +22,15 @@
     <string name="zip">Zip:</string>
     <string name="distance">Distance:</string>
     <string name="weather">Weather:</string>
+    <string name="Current_Location">Current Location:</string>
+    <string name="temperature">%1$s - %2$s F&#176;</string>
     <string name="name_unavailable">name unavailable</string>
     <string name="address_unavailable">address unavailable</string>
     <string name="city_unavailable">city unavailable</string>
     <string name="state_unavailable">state unavailable</string>
     <string name="zip_unavailable">zip unavailable</string>
     <string name="distance_unavailable">zip unavailable</string>
+    <string name="temperature_unavailable">temperature unavailable</string>
     <string name="service_error">Please check your data service.</string>
     <string name="no_city_alert">Please check the city input</string>
     <string name="no_state_alert">Please check the state input</string>

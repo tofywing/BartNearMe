@@ -12,6 +12,7 @@ public class Forecast implements ParseData {
     private String high;
     private String low;
     private String inGeneral;
+    private int code;
 
     public String getDay() {
         return day;
@@ -33,6 +34,10 @@ public class Forecast implements ParseData {
         return inGeneral;
     }
 
+    public int getCode() {
+        return code;
+    }
+
     @Override
     public void parseJSON(JSONObject object) {
         this.day = object.optString("day");
@@ -40,6 +45,7 @@ public class Forecast implements ParseData {
         this.high = String.valueOf(object.optInt("high"));
         this.low = String.valueOf(object.optInt("low"));
         this.inGeneral = object.optString("text");
+        this.code = object.optInt("code");
     }
 }
 

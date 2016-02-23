@@ -27,7 +27,6 @@ public class WeatherService {
 
     YahooWeatherServiceCallBack mCallback;
     Context mContext;
-    private static String location;
 
     public WeatherService(Context context, YahooWeatherServiceCallBack callback) {
         this.mCallback = callback;
@@ -62,15 +61,12 @@ public class WeatherService {
                 super.onPostExecute(s);
                 try {
                     JSONObject jsonData = new JSONObject(s);
-                    JSONArray array = jsonData.optJSONArray("a");
-
                     JSONObject parseQuery = jsonData.optJSONObject("query");
                     int count = parseQuery.optInt("count");
                     //Check general input error including empty city and state
                     if (count == 0) {
                         mCallback.onWeatherActionFailed(new Exception());
                     } else {
-                        //WeatherService.location = location;
                         Channel channel = new Channel();
                         channel.parseJSON(parseQuery.optJSONObject("results").optJSONObject("channel"));
                         mCallback.onWeatherActionSuccess(channel);

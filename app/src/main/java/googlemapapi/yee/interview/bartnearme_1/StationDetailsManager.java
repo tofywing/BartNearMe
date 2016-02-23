@@ -17,6 +17,11 @@ public class StationDetailsManager {
     public static final String CITY = "city";
     public static final String STATE = "state";
     public static final String ZIP = "zip";
+    public static final String TEMP_HIGH = "tempHigh";
+    public static final String TEMP_LOW = "tempLow";
+    public static final String TEMP_IN_GENERAL = "tempInGeneral";
+    public static final String CODE = "code";
+
     public SharedPreferences mSharedPreferences;
 
     public StationDetailsManager(Context context) {
@@ -32,6 +37,10 @@ public class StationDetailsManager {
             editor.putString(CITY, station.getCity());
             editor.putString(STATE, station.getState());
             editor.putString(ZIP, station.getZipCode());
+            editor.putString(TEMP_HIGH, station.getTempHigh());
+            editor.putString(TEMP_LOW, station.getTempLow());
+            editor.putString(TEMP_IN_GENERAL, station.getTempInGeneral());
+            editor.putInt(CODE, station.getCode());
             editor.apply();
         } else {
             Log.i("not save", "station is null");
@@ -47,6 +56,10 @@ public class StationDetailsManager {
             station.setCity(mSharedPreferences.getString(CITY, ""));
             station.setState(mSharedPreferences.getString(STATE, ""));
             station.setZipCode(mSharedPreferences.getString(ZIP, ""));
+            station.setTempHigh(mSharedPreferences.getString(TEMP_HIGH, ""));
+            station.setTempLow(mSharedPreferences.getString(TEMP_LOW, ""));
+            station.setTempInGeneral(mSharedPreferences.getString(TEMP_IN_GENERAL, ""));
+            station.setCode(mSharedPreferences.getInt(CODE, 0));
             return station;
         }
         return null;
