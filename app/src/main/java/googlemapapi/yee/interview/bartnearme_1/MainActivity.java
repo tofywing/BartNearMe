@@ -28,6 +28,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.main_layout);
         mSupportManager = getSupportFragmentManager();
         mManager = getFragmentManager();
+        
         mGoogleMapFragment = new GoogleMapFragment();
         mSupportManager.beginTransaction().add(R.id.map, mGoogleMapFragment).commit();
     }
