@@ -9,6 +9,7 @@
     <string name="service_ready">Ready to Map</string>
     <string name="service_not_ready">Map not available</string>
     <string name="google_map_key">AIzaSyAqEbC-xmYxjB-QJuBNB9nFC9-HNkI-6y0</string>
+    <string name="facebook_app_id">910044272449364</string>
     <string name="input_title">Location:</string>
     <string name="input_hint">Manually input location</string>
     <string name="last_location_failed">Can\u0027t find your location</string>

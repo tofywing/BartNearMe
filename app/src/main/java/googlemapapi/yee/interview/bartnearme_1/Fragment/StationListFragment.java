@@ -65,6 +65,8 @@ public class StationListFragment extends ListFragment {
         super.onResume();
         mManager = getActivity().getFragmentManager();
         mStation = getArguments().getParcelable(TAG);
+        if(mDetailFragment != null && mDetailFragment.isAdded())mManager.beginTransaction().remove(mDetailFragment)
+                .commitAllowingStateLoss();
         if (mStation == null) {
             StationDetailsManager manager = new StationDetailsManager(getActivity());
             mStation = manager.getSavedStation();

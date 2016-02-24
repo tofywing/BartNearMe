@@ -7,6 +7,7 @@ import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -31,6 +32,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -97,6 +104,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     FloatingActionButton mMeButton;
     FloatingActionButton mBartButton;
     FloatingActionButton mBackButton;
+    LoginButton mLogin;
+    CallbackManager mFacebookCallBackManager;
     ProgressDialog mDialog;
     GoogleMap mMap;
     GoogleApiClient mGoogleApiClient;
@@ -134,7 +143,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view;
+        final View view;
+        FacebookSdk.sdkInitialize(getContext());
+        mFacebookCallBackManager = CallbackManager.Factory.create();
         view = inflater.inflate(R.layout.google_map_fragment, container, false);
         if (serviceAvailable()) {
             initMap();
@@ -149,9 +160,28 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         super.onViewCreated(view, savedInstanceState);
         mBartService = new BartService(getActivity(), this);
         mWeatherService = new WeatherService(getActivity(), this);
+        mLogin = (LoginButton) view.findViewById(R.id.login_button);
+        mLogin.setReadPermissions("public_profile");
+        mLogin.setFragment(this);
+        mLogin.registerCallback(mFacebookCallBackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                MainActivity.makeToast(view.getContext(), "SUCCESS");
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
         mPositionManager = new MapPositionManager(getActivity());
         //TODO
-        mMapInput = (EditText) getActivity().findViewById(R.id.mapInput);
+        mMapInput = (EditText) view.findViewById(R.id.mapInput);
         mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
         if (mPreference.contains(INPUT)) mMapInput.setText(mPreference.getString(INPUT, ""));
         mMapInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -186,7 +216,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 return false;
             }
         });
-        mMeButton = (FloatingActionButton) getActivity().findViewById(R.id.findMe);
+        mMeButton = (FloatingActionButton) view.findViewById(R.id.findMe);
 
         mMeButton.setBackgroundTintList(pink);
         mMeButton.setOnClickListener(new View.OnClickListener() {
@@ -203,7 +233,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                          }
                                      }
         );
-        mBartButton = (FloatingActionButton) getActivity().findViewById(R.id.findBart);
+        mBartButton = (FloatingActionButton) view.findViewById(R.id.findBart);
 
         mBartButton.setBackgroundTintList(blue);
         mListFragment = StationListFragment.newInstance(null);
@@ -218,7 +248,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                            }
                                        }
         );
-        mBackButton = (FloatingActionButton) getActivity().findViewById(R.id.back);
+        mBackButton = (FloatingActionButton) view.findViewById(R.id.back);
         mBackButton.setBackgroundTintList(yellow);
         mBackButton.setOnClickListener(new View.OnClickListener() {
                                            @Override
@@ -252,6 +282,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         editor.putBoolean(BACK_ME, isBackToMe);
         editor.putBoolean(BACK_BART, isBackToBart);
         editor.apply();
+        if (mListFragment != null && mListFragment.isAdded()) mManager.beginTransaction().remove(mListFragment)
+                .commitAllowingStateLoss();
     }
 
     private boolean serviceAvailable() {
@@ -585,6 +617,12 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         Geocoder gc = new Geocoder(getActivity());
         List<Address> addresses = gc.getFromLocation(lat, lng, 1);
         return addresses.get(0);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mFacebookCallBackManager.onActivityResult(requestCode, resultCode, data);
     }
 }
 
