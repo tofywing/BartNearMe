@@ -57,7 +57,7 @@ public class StationDetailsFragment extends Fragment {
         if (station != null) {
             mName.setText(station.getName());
             mAddress.setText(station.getAddress());
-            mDistance.setText(station.getDistance());
+            mDistance.setText(getString(R.string.distance_format, station.getDistance()));
             mCity.setText(station.getCity());
             mState.setText(station.getState());
             mZip.setText(station.getZipCode());

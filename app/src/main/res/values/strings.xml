@@ -43,4 +43,5 @@
     <string name="general_input_error_alert">Please check your input</string>
     <string name="city_state_not_match_alert">City and state are not matched</string>
     <string name="confirm_alert">Confirm</string>
+    <string name="distance_format">%s km</string>
 </resources>

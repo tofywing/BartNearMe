@@ -19,19 +19,18 @@
         android:protectionLevel="signature"/>
     <uses-permission android:name="googleapi1.yee.interview.bartnearme"/>
 
-
-    <!--Allow user to share data like link and photo on Facebook-->
-    <provider
-        android:name="com.facebook.FacebookContentProvider"
-        android:authorities="com.facebook.app.FacebookContentProvider1234"
-        android:exported="true"/>
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!--Allow user to share data like link and photo on Facebook-->
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider1234"
+            android:exported="true"/>
 
         <activity
             android:name="googlemapapi.yee.interview.bartnearme_1.MainActivity"
