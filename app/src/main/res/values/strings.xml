@@ -15,7 +15,7 @@
     <string name="input_hint">Manually input location</string>
     <string name="last_location_failed">Can\u0027t find your location</string>
     <string name="alert_wrong_input">No result matched your input address</string>
-    <string name="alert_too_far">The most closest Bart station is %s km from you :/</string>
+    <string name="alert_too_far">The most closest Bart station is %s km from you :/ Too far…</string>
     <string name="alert_button_comfirm">Yup</string>
     <string name="alert_no_avatar">There is no avatar record in system :( and you may get your avatar by log-in your
         facebook again that can update your avatar in system :)
@@ -44,4 +44,5 @@
     <string name="city_state_not_match_alert">City and state are not matched</string>
     <string name="confirm_alert">Confirm</string>
     <string name="distance_format">%s km</string>
+    <string name="none">N/A</string>
 </resources>

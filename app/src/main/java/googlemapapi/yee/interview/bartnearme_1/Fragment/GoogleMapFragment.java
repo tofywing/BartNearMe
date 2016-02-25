@@ -98,12 +98,17 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String LAST_UPDATE_TIME = "updateTime";
     private static final String LOGGED_IN = "loggedIn";
+    private static final String PREVIOUS_LATITUDE = "previousLatitude";
+    private static final String PREVIOUS_LONGITUDE = "previousLongitude";
+    private static final String PREVIOUS_ZOOM = "previousZoom";
+    private static final String PREVIOUS_LOCALITY = "previousLocality";
 
     //TODO:
     private static final String ICON_PATH = "iconPath";
     private static final int GPS_ERROR_DIALOG_REQUEST = 9001;
     private static final int STATION_REQUIRED = 5;
     private static final int SATISFY_DISTANCE = 25;
+    private static final String DEFAULT_LOCALITY = "N/A";
     EditText mMapInput;
     FloatingActionButton mMeButton;
     FloatingActionButton mBartButton;
@@ -115,6 +120,10 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     Location mCurrentLocation;
+//    float previousLatitude = -1f;
+//    float previousLongitude = -1f;
+//    float previousZoom = STATION_ZOOM;
+    String previousLocality = DEFAULT_LOCALITY;
     Marker mMarker;
     //city
     String mLocality;
@@ -137,6 +146,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     boolean isBackToMe = true;
     boolean isBackToBart = false;
     SharedPreferences mPreference;
+    SharedPreferences.Editor mEditor;
 
     int[][] colorPattern = new int[][]{new int[]{Color.parseColor("#FF4081")}, new int[]{Color.parseColor("#366792")
     }, new int[]{Color.parseColor("#F0EB5A")}};
@@ -167,7 +177,13 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mWeatherService = new WeatherService(getActivity(), this);
         mImageService = new ImageService(getActivity(), this);
         mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
+        mPositionManager = new MapPositionManager(getActivity());
         if (mPreference.contains(LOGGED_IN)) isLoggedIn = mPreference.getBoolean(LOGGED_IN, false);
+//        if (mPreference.contains(PREVIOUS_LATITUDE)) previousLatitude = mPreference.getFloat(PREVIOUS_LATITUDE, 0);
+//        if (mPreference.contains(PREVIOUS_LONGITUDE)) previousLongitude = mPreference.getFloat(PREVIOUS_LONGITUDE, 0);
+//        if (mPreference.contains(PREVIOUS_ZOOM)) previousZoom = mPreference.getFloat(PREVIOUS_ZOOM, STATION_ZOOM);
+        if(mPreference.contains(PREVIOUS_LOCALITY))previousLocality = mPreference.getString(PREVIOUS_LOCALITY,
+                DEFAULT_LOCALITY);
         mLogin = (LoginButton) view.findViewById(R.id.login_button);
         mLogin.setReadPermissions("public_profile");
         mLogin.setFragment(this);
@@ -197,9 +213,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 }
             }
         });
-
-
-        mPositionManager = new MapPositionManager(getActivity());
         //TODO
         mMapInput = (EditText) view.findViewById(R.id.mapInput);
         if (mPreference.contains(INPUT)) mMapInput.setText(mPreference.getString(INPUT, ""));
@@ -272,6 +285,17 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mBackButton.setOnClickListener(new View.OnClickListener() {
                                            @Override
                                            public void onClick(View v) {
+
+//                                               MainActivity.makeToast(getActivity(),String.valueOf(previousLatitude)+
+//                                                       String.valueOf(previousLongitude)+String.valueOf(previousZoom));
+//
+//                                               if (previousLatitude != -1 && previousLongitude != -1) {
+//                                                   setStartMarker(previousLocality,previousLatitude,previousLongitude);
+//                                                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new
+//                                                           LatLng(previousLatitude, previousLongitude), previousZoom);
+//                                                   mMap.animateCamera(cameraUpdate);
+//                                               }
+
                                                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new
                                                        LatLng(mPositionManager.getLatitude
                                                        (), mPositionManager.getLongitude()), isBackToMe ?
@@ -294,14 +318,18 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         super.onStop();
         MapStateManager manager = new MapStateManager(getActivity());
         manager.saveMapState(mMap);
-        SharedPreferences.Editor editor = mPreference.edit();
-        editor.putString(INPUT, mMapInput.getText().toString());
-        editor.putBoolean(ME, isMePressed);
-        editor.putBoolean(BART, isBartPressed);
-        editor.putBoolean(BACK_ME, isBackToMe);
-        editor.putBoolean(BACK_BART, isBackToBart);
-        editor.putBoolean(LOGGED_IN, isLoggedIn);
-        editor.apply();
+        mEditor = mPreference.edit();
+        mEditor.putString(INPUT, mMapInput.getText().toString());
+        mEditor.putBoolean(ME, isMePressed);
+        mEditor.putBoolean(BART, isBartPressed);
+        mEditor.putBoolean(BACK_ME, isBackToMe);
+        mEditor.putBoolean(BACK_BART, isBackToBart);
+        mEditor.putBoolean(LOGGED_IN, isLoggedIn);
+//        mEditor.putFloat(PREVIOUS_LATITUDE, previousLatitude);
+//        mEditor.putFloat(PREVIOUS_LONGITUDE, previousLongitude);
+//        mEditor.putFloat(PREVIOUS_ZOOM, previousZoom);
+        mEditor.putString(PREVIOUS_LOCALITY, previousLocality);
+        mEditor.apply();
         if (mListFragment != null && mListFragment.isAdded()) mManager.beginTransaction().remove(mListFragment)
                 .commitAllowingStateLoss();
     }
@@ -370,8 +398,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                     .getTitle());
                             mListFragment = StationListFragment.newInstance(station);
                             mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
-                            if (station != null) {
-                            }
                             return false;
                         }
                     });
@@ -387,6 +413,18 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     private void goToLocation(double lat, double lng, float zoom) {
         LatLng ll = new LatLng(lat, lng);
+
+
+//        if (mLatLng != null) {
+//            previousLatitude = (float) mLatLng.latitude;
+//            previousLongitude = (float) mLatLng.longitude;
+//        }
+//        if (mMap != null) {
+//            previousZoom = mMap.getCameraPosition().zoom;
+//        }
+
+
+
         mLatLng = ll;
         mCurrentLocation = new Location("");
         mCurrentLocation.setLatitude(lat);
@@ -417,12 +455,30 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             Geocoder gc = new Geocoder(getActivity());
             List<Address> addresses = gc.getFromLocation(lat, lng, 1);
             Address address = addresses.get(0);
+            previousLocality = mLocality;
             mLocality = address.getLocality();
             setStartMarker(mLocality, lat, lng);
             LatLng ll = new LatLng(lat, lng);
+
+
+//            if (mLatLng != null) {
+//                previousLatitude = (float) mLatLng.latitude;
+//                previousLongitude = (float) mLatLng.longitude;
+//            }
+//            if (mMap != null) {
+//                previousZoom = mMap.getCameraPosition().zoom;
+//            }
+
+
             mLatLng = ll;
             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(ll, DEFAULT_ZOOM);
             mMap.animateCamera(update);
+            mEditor = mPreference.edit();
+//            mEditor.putFloat(PREVIOUS_LONGITUDE, previousLongitude);
+//            mEditor.putFloat(PREVIOUS_ZOOM, previousZoom);
+            mEditor.putString(PREVIOUS_LOCALITY, previousLocality);
+            mEditor.apply();
+
             //TODO
             mPositionManager.saveMapPosition(address, ICON_PATH);
         } else {
@@ -435,9 +491,18 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             double lat = address.getLatitude();
             double lng = address.getLongitude();
             goToLocation(lat, lng, DEFAULT_ZOOM);
+            previousLocality = mLocality;
             mLocality = address.getLocality();
             setStartMarker(mLocality, lat, lng);
             //TODO
+
+            mEditor = mPreference.edit();
+//            mEditor.putFloat(PREVIOUS_LONGITUDE, previousLongitude);
+//            mEditor.putFloat(PREVIOUS_ZOOM, previousZoom);
+            mEditor.putString(PREVIOUS_LOCALITY, previousLocality);
+            mEditor.apply();
+
+
             mPositionManager.saveMapPosition(address, ICON_PATH);
         }
     }
@@ -498,6 +563,17 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mMap.moveCamera(update);
             double lat = mPositionManager.getLatitude();
             double lng = mPositionManager.getLongitude();
+
+
+//            if (mLatLng != null) {
+//                previousLatitude = (float) mLatLng.latitude;
+//                previousLongitude = (float) mLatLng.longitude;
+//            }
+//            if (mMap != null) {
+//                previousZoom = mMap.getCameraPosition().zoom;
+//            }
+
+
             mLatLng = new LatLng(lat, lng);
             setStartMarker(mPositionManager.getLocality(), lat, lng);
             mBartService.getStationInfo();
