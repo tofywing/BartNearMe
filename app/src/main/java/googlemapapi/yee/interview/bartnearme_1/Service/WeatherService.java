@@ -33,7 +33,7 @@ public class WeatherService {
         this.mContext = context;
     }
 
-    public void getWeather(String location) {
+    public void getWeatherInfo(String location) {
         new AsyncTask<String, Void, String>() {
             @Override
             protected String doInBackground(String... params) {

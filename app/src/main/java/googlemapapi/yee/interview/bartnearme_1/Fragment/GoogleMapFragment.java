@@ -11,11 +11,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -56,7 +65,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -66,6 +81,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import googlemapapi.yee.interview.bartnearme_1.CallBack.BartServiceCallBack;
+import googlemapapi.yee.interview.bartnearme_1.CallBack.ImageServiceCallBack;
 import googlemapapi.yee.interview.bartnearme_1.CallBack.YahooWeatherServiceCallBack;
 import googlemapapi.yee.interview.bartnearme_1.Data.Channel;
 import googlemapapi.yee.interview.bartnearme_1.Data.Forecast;
@@ -75,6 +91,7 @@ import googlemapapi.yee.interview.bartnearme_1.MapStateManager;
 import googleapi1.yee.interview.bartnearme_1.R;
 import googlemapapi.yee.interview.bartnearme_1.Service.BartService;
 import googlemapapi.yee.interview.bartnearme_1.Data.Station;
+import googlemapapi.yee.interview.bartnearme_1.Service.ImageService;
 import googlemapapi.yee.interview.bartnearme_1.Service.WeatherService;
 import googlemapapi.yee.interview.bartnearme_1.StationManager;
 
@@ -82,7 +99,7 @@ import googlemapapi.yee.interview.bartnearme_1.StationManager;
  * Created by Yee on 2/5/16.
  */
 public class GoogleMapFragment extends Fragment implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient
-        .OnConnectionFailedListener, BartServiceCallBack, YahooWeatherServiceCallBack {
+        .OnConnectionFailedListener, BartServiceCallBack, YahooWeatherServiceCallBack, ImageServiceCallBack {
 
     public static final float DEFAULT_ZOOM = 15;
     public static final float STATION_ZOOM = 9.5f;
@@ -94,6 +111,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public static final String BACK_BART = "BackTobart";
     private static final String CURRENT_LOCATION = "currentLocation";
     private static final String LAST_UPDATE_TIME = "updateTime";
+    private static final String LOGGED_IN = "loggedIn";
 
     //TODO:
     private static final String ICON_PATH = "iconPath";
@@ -115,15 +133,16 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     //city
     String mLocality;
 
+    static Bitmap mFacebookAvatar;
+    boolean isLoggedIn;
 
     Station mStation;
     int mIndex = 0;
-    Map<Integer, Station> mStationWeatherMap = new TreeMap<>();
-
 
     StationListFragment mListFragment;
     BartService mBartService;
     WeatherService mWeatherService;
+    ImageService mImageService;
     FragmentManager mManager;
     MapPositionManager mPositionManager;
     //TODO: KEY CHECKING
@@ -160,18 +179,22 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         super.onViewCreated(view, savedInstanceState);
         mBartService = new BartService(getActivity(), this);
         mWeatherService = new WeatherService(getActivity(), this);
+        mImageService = new ImageService(getActivity(),this);
+        mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
+        if (mPreference.contains(LOGGED_IN)) isLoggedIn = mPreference.getBoolean(LOGGED_IN, false);
         mLogin = (LoginButton) view.findViewById(R.id.login_button);
         mLogin.setReadPermissions("public_profile");
         mLogin.setFragment(this);
         mLogin.registerCallback(mFacebookCallBackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                isLoggedIn = true;
                 MainActivity.makeToast(view.getContext(), "SUCCESS");
+                mImageService.getImageInfo(loginResult);
             }
 
             @Override
             public void onCancel() {
-
             }
 
             @Override
@@ -179,10 +202,22 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
             }
         });
+
+        mLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isLoggedIn) {
+                    isLoggedIn = false;
+                    mMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
+                    MainActivity.makeToast(getActivity(), "logged out");
+                }
+            }
+        });
+
+
         mPositionManager = new MapPositionManager(getActivity());
         //TODO
         mMapInput = (EditText) view.findViewById(R.id.mapInput);
-        mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
         if (mPreference.contains(INPUT)) mMapInput.setText(mPreference.getString(INPUT, ""));
         mMapInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -281,6 +316,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         editor.putBoolean(BART, isBartPressed);
         editor.putBoolean(BACK_ME, isBackToMe);
         editor.putBoolean(BACK_BART, isBackToBart);
+        editor.putBoolean(LOGGED_IN, isLoggedIn);
         editor.apply();
         if (mListFragment != null && mListFragment.isAdded()) mManager.beginTransaction().remove(mListFragment)
                 .commitAllowingStateLoss();
@@ -314,8 +350,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     Snackbar.make(getView(), getText(R.string.service_ready), Snackbar
                             .LENGTH_SHORT).show();
                     mMap = map;
-
-
                     //TODO On MAP CLICK
                     mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                         @Override
@@ -506,7 +540,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mMarker.remove();
         }
         MarkerOptions options = new MarkerOptions().title(locality).position(new LatLng(lat, lng)).icon
-                (BitmapDescriptorFactory.defaultMarker());
+                (isLoggedIn ? BitmapDescriptorFactory.fromBitmap(mFacebookAvatar) : BitmapDescriptorFactory
+                        .defaultMarker());
         mMarker = mMap.addMarker(options);
     }
 
@@ -524,13 +559,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     .parseDouble(station.getLatitude()), Double.parseDouble(station.getLongitude()))).icon
                     (BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
             marker = mMap.addMarker(options);
-//???
-            // ????
-            //
-            //
-
-            // mMarker.setIcon(BitmapDescriptorFactory.fromFile());
-
             mMarkerList.add(marker);
         }
     }
@@ -544,7 +572,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
         showWeatherDialog(getActivity());
         stationGetWeather();
-        mWeatherService.getWeather(mStation.getCity() + "," + mStation.getState());
+        mWeatherService.getWeatherInfo(mStation.getCity() + "," + mStation.getState());
         if (mListFragment != null && mListFragment.isAdded())
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = StationListFragment.newInstance(null);
@@ -609,7 +637,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     void stationGetWeather() {
         if (mIndex < STATION_REQUIRED) {
             mStation = Station.data.get(mIndex);
-            mWeatherService.getWeather(mStation.getCity() + "," + mStation.getState());
+            mWeatherService.getWeatherInfo(mStation.getCity() + "," + mStation.getState());
         }
     }
 
@@ -623,6 +651,18 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mFacebookCallBackManager.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onImageActionSuccess(Bitmap bitmap, ProgressDialog dialog) {
+        mFacebookAvatar = ImageService.getCroppedBitmap(bitmap, 170);
+        mMarker.setIcon(BitmapDescriptorFactory.fromBitmap(mFacebookAvatar));
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onImageActionFailed(ProgressDialog dialog) {
+        dialog.dismiss();
     }
 }
 
