@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -35,10 +36,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.Profile;
 import com.facebook.login.LoginBehavior;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
@@ -173,15 +176,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             public void onSuccess(LoginResult loginResult) {
                 isLoggedIn = true;
                 mImageService.getImageInfo(loginResult);
-
-
-                LoginManager loginManager = LoginManager.getInstance();
-                LoginBehavior behavior = loginManager.getLoginBehavior();
-                
-              MainActivity.makeToast(getActivity(),behavior.toString());
-
-
-
             }
 
             @Override
@@ -663,6 +657,11 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public void onImageActionFailed(ProgressDialog dialog) {
         dialog.dismiss();
+    }
+
+    public boolean isLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
     }
 }
 

@@ -17,6 +17,9 @@
     <string name="alert_wrong_input">No result matched your input address</string>
     <string name="alert_too_far">The most closest Bart station is %s km from you :/</string>
     <string name="alert_button_comfirm">Yup</string>
+    <string name="alert_no_avatar">There is no avatar record in system :( and you may get your avatar by log-in your
+        facebook again that can update your avatar in system :)
+    </string>
     <string name="no_stations_found">No stations found</string>
     <string name="name">Name:</string>
     <string name="address">Address:</string>
