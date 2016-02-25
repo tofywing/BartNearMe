@@ -31,17 +31,4 @@ public class MainActivity extends FragmentActivity {
         mGoogleMapFragment = new GoogleMapFragment();
         mSupportManager.beginTransaction().add(R.id.map, mGoogleMapFragment).commit();
     }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        makeToast(this,"STOP");
-
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        makeToast(this,"PAUSE");
-    }
 }

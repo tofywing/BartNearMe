@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.FragmentManager;
+import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,19 +13,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -45,6 +39,8 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginBehavior;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
@@ -63,22 +59,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONException;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 import googlemapapi.yee.interview.bartnearme_1.CallBack.BartServiceCallBack;
 import googlemapapi.yee.interview.bartnearme_1.CallBack.ImageServiceCallBack;
@@ -179,7 +162,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         super.onViewCreated(view, savedInstanceState);
         mBartService = new BartService(getActivity(), this);
         mWeatherService = new WeatherService(getActivity(), this);
-        mImageService = new ImageService(getActivity(),this);
+        mImageService = new ImageService(getActivity(), this);
         mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
         if (mPreference.contains(LOGGED_IN)) isLoggedIn = mPreference.getBoolean(LOGGED_IN, false);
         mLogin = (LoginButton) view.findViewById(R.id.login_button);
@@ -189,8 +172,16 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             @Override
             public void onSuccess(LoginResult loginResult) {
                 isLoggedIn = true;
-                MainActivity.makeToast(view.getContext(), "SUCCESS");
                 mImageService.getImageInfo(loginResult);
+
+
+                LoginManager loginManager = LoginManager.getInstance();
+                LoginBehavior behavior = loginManager.getLoginBehavior();
+                
+              MainActivity.makeToast(getActivity(),behavior.toString());
+
+
+
             }
 
             @Override
@@ -209,7 +200,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                 if (isLoggedIn) {
                     isLoggedIn = false;
                     mMarker.setIcon(BitmapDescriptorFactory.defaultMarker());
-                    MainActivity.makeToast(getActivity(), "logged out");
                 }
             }
         });
@@ -354,6 +344,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                         @Override
                         public void onMapClick(LatLng latLng) {
+                            //TODO
+                            mLatLng = latLng;
                             try {
                                 if (mMarker != null) {
                                     mMarker.remove();
@@ -464,14 +456,14 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
     void showMapDialog(Context context) {
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.loading_map));
+        mDialog.setMessage(context.getString(R.string.map_initialize));
         mDialog.setCancelable(false);
         mDialog.show();
     }
 
     void showWeatherDialog(Context context) {
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.loading_weather));
+        mDialog.setMessage(context.getString(R.string.weather_loading));
         mDialog.setCancelable(false);
         mDialog.show();
     }
@@ -518,6 +510,14 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         } else {
             try {
                 goToCurrentLocation();
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mBartService.getStationInfo();
+                    }
+                }, 2000);
+                isBartPressed = true;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -569,8 +569,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         Station.setData(stationManager.getCloseStationsInCount(mLatLng, STATION_REQUIRED));
         mIndex = 0;
         dialog.dismiss();
-
         showWeatherDialog(getActivity());
+        //Set mStation also
         stationGetWeather();
         mWeatherService.getWeatherInfo(mStation.getCity() + "," + mStation.getState());
         if (mListFragment != null && mListFragment.isAdded())
@@ -610,7 +610,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mIndex++;
             stationGetWeather();
         } else {
-
             if (Station.data != null) {
                 String distance = Station.data.get(0).getDistance();
                 if ((Float.parseFloat(distance)) >= SATISFY_DISTANCE) {
@@ -637,6 +636,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     void stationGetWeather() {
         if (mIndex < STATION_REQUIRED) {
             mStation = Station.data.get(mIndex);
+            mDialog.setMessage(getString(R.string.weather_loading, mStation.getName()));
             mWeatherService.getWeatherInfo(mStation.getCity() + "," + mStation.getState());
         }
     }

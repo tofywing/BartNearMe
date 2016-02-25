@@ -121,7 +121,7 @@ public class BartService {
 
     void showDialog(Context context) {
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.loading_map));
+        mDialog.setMessage(context.getString(R.string.map_loading));
         mDialog.setCancelable(false);
         mDialog.show();
     }

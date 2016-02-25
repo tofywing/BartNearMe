@@ -3,8 +3,9 @@
     <string name="find_me">Me</string>
     <string name="find_bart">Bart</string>
     <string name="back">Back</string>
-    <string name="loading_map">loading map…</string>
-    <string name="loading_weather">loading weather…</string>
+    <string name="map_initialize">Map initializing…</string>
+    <string name="map_loading">loading map…</string>
+    <string name="weather_loading">loading %s station…</string>
     <string name="service_unavailable">Can\u0027t connect to google services</string>
     <string name="service_ready">Ready to Map</string>
     <string name="service_not_ready">Map not available</string>
@@ -14,8 +15,7 @@
     <string name="input_hint">Manually input location</string>
     <string name="last_location_failed">Can\u0027t find your location</string>
     <string name="alert_wrong_input">No result matched your input address</string>
-    <string name="alert_too_far">The most close Bart station is %s km around you."\n"Would you still want to
-        go anyway?</string>
+    <string name="alert_too_far">The most closest Bart station is %s km from you :/</string>
     <string name="alert_button_comfirm">Yup</string>
     <string name="no_stations_found">No stations found</string>
     <string name="name">Name:</string>
