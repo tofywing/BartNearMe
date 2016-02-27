@@ -120,7 +120,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest;
     Location mCurrentLocation;
-//    float previousLatitude = -1f;
+    //    float previousLatitude = -1f;
 //    float previousLongitude = -1f;
 //    float previousZoom = STATION_ZOOM;
     String previousLocality = DEFAULT_LOCALITY;
@@ -182,7 +182,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 //        if (mPreference.contains(PREVIOUS_LATITUDE)) previousLatitude = mPreference.getFloat(PREVIOUS_LATITUDE, 0);
 //        if (mPreference.contains(PREVIOUS_LONGITUDE)) previousLongitude = mPreference.getFloat(PREVIOUS_LONGITUDE, 0);
 //        if (mPreference.contains(PREVIOUS_ZOOM)) previousZoom = mPreference.getFloat(PREVIOUS_ZOOM, STATION_ZOOM);
-        if(mPreference.contains(PREVIOUS_LOCALITY))previousLocality = mPreference.getString(PREVIOUS_LOCALITY,
+        if (mPreference.contains(PREVIOUS_LOCALITY)) previousLocality = mPreference.getString(PREVIOUS_LOCALITY,
                 DEFAULT_LOCALITY);
         mLogin = (LoginButton) view.findViewById(R.id.login_button);
         mLogin.setReadPermissions("public_profile");
@@ -287,10 +287,12 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                                            public void onClick(View v) {
 
 //                                               MainActivity.makeToast(getActivity(),String.valueOf(previousLatitude)+
-//                                                       String.valueOf(previousLongitude)+String.valueOf(previousZoom));
+//                                                       String.valueOf(previousLongitude)+String.valueOf
+// (previousZoom));
 //
 //                                               if (previousLatitude != -1 && previousLongitude != -1) {
-//                                                   setStartMarker(previousLocality,previousLatitude,previousLongitude);
+//                                                   setStartMarker(previousLocality,previousLatitude,
+// previousLongitude);
 //                                                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new
 //                                                           LatLng(previousLatitude, previousLongitude), previousZoom);
 //                                                   mMap.animateCamera(cameraUpdate);
@@ -349,7 +351,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     }
 
     private void initMap() {
-        showMapDialog(getActivity());
+        showDialog(getActivity(), R.string.map_initialize);
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).addApi(LocationServices.API)
                 .addConnectionCallbacks
                         (this).addOnConnectionFailedListener(this).build();
@@ -422,7 +424,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 //        if (mMap != null) {
 //            previousZoom = mMap.getCameraPosition().zoom;
 //        }
-
 
 
         mLatLng = ll;
@@ -513,23 +514,16 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         manager.hideSoftInputFromInputMethod(view.getWindowToken(), 0);
     }
 
-    void showMapDialog(Context context) {
+    void showDialog(Context context, int resId) {
         mDialog = new ProgressDialog(context);
         mDialog.setMessage(context.getString(R.string.map_initialize));
         mDialog.setCancelable(false);
         mDialog.show();
     }
 
-    void showWeatherDialog(Context context) {
-        mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.weather_loading));
-        mDialog.setCancelable(false);
-        mDialog.show();
-    }
-
     @Override
     public void onConnected(Bundle bundle) {
-        showMapDialog(getActivity());
+        showDialog(getActivity(), R.string.map_initialize);
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         //Google suggest production to update location in 60s to save the battery
@@ -575,6 +569,20 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
 
             mLatLng = new LatLng(lat, lng);
+            if (mMap == null) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (mMap == null) {
+                            Snackbar.make(getView(), getText(R.string.map_loading_failed), Snackbar.LENGTH_SHORT).show();
+                            showDialog(getActivity(),R.string.map_reloading);
+                            initMap();
+                        }
+                    }
+                }, 1000);
+            }
+            mDialog.dismiss();
             setStartMarker(mPositionManager.getLocality(), lat, lng);
             mBartService.getStationInfo();
         } else {
@@ -639,7 +647,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         Station.setData(stationManager.getCloseStationsInCount(mLatLng, STATION_REQUIRED));
         mIndex = 0;
         dialog.dismiss();
-        showWeatherDialog(getActivity());
+        showDialog(getActivity(), R.string.weather_loading);
         //Set mStation also
         stationGetWeather();
         mWeatherService.getWeatherInfo(mStation.getCity() + "," + mStation.getState());

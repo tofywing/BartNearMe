@@ -5,6 +5,8 @@
     <string name="back">Back</string>
     <string name="map_initialize">Map initializing…</string>
     <string name="map_loading">loading map…</string>
+    <string name="map_reloading">Reloading map…</string>
+    <string name="map_loading_failed">Map Loading Failed</string>
     <string name="weather_loading">loading %s station…</string>
     <string name="service_unavailable">Can\u0027t connect to google services</string>
     <string name="service_ready">Ready to Map</string>
