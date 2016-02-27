@@ -139,6 +139,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     WeatherService mWeatherService;
     ImageService mImageService;
     FragmentManager mManager;
+    android.support.v4.app.FragmentManager mSupportManager;
     SupportMapFragment mMapFragment;
     MapPositionManager mPositionManager;
     //TODO: KEY CHECKING
@@ -179,6 +180,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mImageService = new ImageService(getActivity(), this);
         mPreference = getActivity().getPreferences(Context.MODE_PRIVATE);
         mPositionManager = new MapPositionManager(getActivity());
+        mManager = getActivity().getFragmentManager();
+        mSupportManager = getActivity().getSupportFragmentManager();
         if (mPreference.contains(LOGGED_IN)) isLoggedIn = mPreference.getBoolean(LOGGED_IN, false);
 //        if (mPreference.contains(PREVIOUS_LATITUDE)) previousLatitude = mPreference.getFloat(PREVIOUS_LATITUDE, 0);
 //        if (mPreference.contains(PREVIOUS_LONGITUDE)) previousLongitude = mPreference.getFloat(PREVIOUS_LONGITUDE, 0);
@@ -270,7 +273,6 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
 
         mBartButton.setBackgroundTintList(blue);
         mListFragment = StationListFragment.newInstance(null);
-        mManager = getActivity().getFragmentManager();
         mBartButton.setOnClickListener(new View.OnClickListener() {
                                            @Override
                                            public void onClick(View v) {
@@ -335,6 +337,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mEditor.apply();
         if (mListFragment != null && mListFragment.isAdded()) mManager.beginTransaction().remove(mListFragment)
                 .commitAllowingStateLoss();
+
+        if (mMapFragment != null && mMapFragment.isAdded())
+            mSupportManager.beginTransaction().remove(mMapFragment).commitAllowingStateLoss();
     }
 
     private boolean serviceAvailable() {
@@ -659,6 +664,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = StationListFragment.newInstance(null);
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
+        if(!mMapFragment.isAdded())mSupportManager.beginTransaction().add(R.id.mapFragment,mMapFragment).commit();
         //Check the Bart Key press state
         if (mPreference.getBoolean(BART, false) || isBartPressed) {
             setEndMarker(Station.data);
