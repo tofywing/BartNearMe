@@ -139,6 +139,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     WeatherService mWeatherService;
     ImageService mImageService;
     FragmentManager mManager;
+    SupportMapFragment mMapFragment;
     MapPositionManager mPositionManager;
     //TODO: KEY CHECKING
     boolean isMePressed = true;
@@ -355,9 +356,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity()).addApi(LocationServices.API)
                 .addConnectionCallbacks
                         (this).addOnConnectionFailedListener(this).build();
-        SupportMapFragment fragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id
+        mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id
                 .mapFragment);
-        fragment.getMapAsync(new OnMapReadyCallback() {
+        mMapFragment.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap map) {
                 if (map != null) {
@@ -515,8 +516,10 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     }
 
     void showDialog(Context context, int resId) {
+        //TO make sure the progress dialog is Dismissed
+        if (mDialog != null) mDialog.dismiss();
         mDialog = new ProgressDialog(context);
-        mDialog.setMessage(context.getString(R.string.map_initialize));
+        mDialog.setMessage(context.getString(resId));
         mDialog.setCancelable(false);
         mDialog.show();
     }
@@ -575,8 +578,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
                     @Override
                     public void run() {
                         if (mMap == null) {
-                            Snackbar.make(getView(), getText(R.string.map_loading_failed), Snackbar.LENGTH_SHORT).show();
-                            showDialog(getActivity(),R.string.map_reloading);
+                            Snackbar.make(getView(), getText(R.string.map_loading_failed), Snackbar.LENGTH_SHORT)
+                                    .show();
+                            showDialog(getActivity(), R.string.map_reloading);
                             initMap();
                         }
                     }
