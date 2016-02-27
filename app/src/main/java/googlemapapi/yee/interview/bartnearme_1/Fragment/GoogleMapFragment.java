@@ -175,6 +175,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+//        MainActivity.makeToast(getActivity(), "Create");
         mBartService = new BartService(getActivity(), this);
         mWeatherService = new WeatherService(getActivity(), this);
         mImageService = new ImageService(getActivity(), this);
@@ -314,13 +315,31 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
     @Override
     public void onStart() {
         super.onStart();
+//        MainActivity.makeToast(getActivity(), "start");
         mGoogleApiClient.connect();
     }
+
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+////        MainActivity.makeToast(getActivity(), "pause");
+//        if(mMapFragment != null && !mMapFragment.isAdded()) mMapFragment = (SupportMapFragment)
+// getChildFragmentManager().findFragmentById(R.id
+//                .mapFragment);
+//    }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        MainActivity.makeToast(getActivity(), "resume");
+//    }
+
 
     @Override
     public void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();
+//        MainActivity.makeToast(getActivity(), "stop");
         MapStateManager manager = new MapStateManager(getActivity());
         manager.saveMapState(mMap);
         mEditor = mPreference.edit();
@@ -337,9 +356,8 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
         mEditor.apply();
         if (mListFragment != null && mListFragment.isAdded()) mManager.beginTransaction().remove(mListFragment)
                 .commitAllowingStateLoss();
-
-        if (mMapFragment != null && mMapFragment.isAdded())
-            mSupportManager.beginTransaction().remove(mMapFragment).commitAllowingStateLoss();
+//        if (mMapFragment != null && mMapFragment.isAdded()) mSupportManager.beginTransaction().remove(mMapFragment)
+//                .commitAllowingStateLoss();
     }
 
     private boolean serviceAvailable() {
@@ -627,8 +645,9 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mMarker.remove();
         }
         MarkerOptions options = new MarkerOptions().title(locality).position(new LatLng(lat, lng)).icon
-                (isLoggedIn ? BitmapDescriptorFactory.fromBitmap(mFacebookAvatar) : BitmapDescriptorFactory
-                        .defaultMarker());
+                (isLoggedIn && mFacebookAvatar != null ? BitmapDescriptorFactory.fromBitmap(mFacebookAvatar) :
+                        BitmapDescriptorFactory
+                                .defaultMarker());
         mMarker = mMap.addMarker(options);
     }
 
@@ -664,7 +683,7 @@ public class GoogleMapFragment extends Fragment implements GoogleApiClient.Conne
             mManager.beginTransaction().remove(mListFragment).commit();
         mListFragment = StationListFragment.newInstance(null);
         mManager.beginTransaction().add(R.id.stationList, mListFragment).commit();
-        if(!mMapFragment.isAdded())mSupportManager.beginTransaction().add(R.id.mapFragment,mMapFragment).commit();
+//        if(!mMapFragment.isAdded())mSupportManager.beginTransaction().add(R.id.mapFragment,mMapFragment).commit();
         //Check the Bart Key press state
         if (mPreference.getBoolean(BART, false) || isBartPressed) {
             setEndMarker(Station.data);
